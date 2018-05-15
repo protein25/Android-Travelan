@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Travelan</string>
+
+    <string name="nav_newspeed">Newspeed</string>
+    <string name="nav_plan">Plan</string>
+    <string name="nav_info">Info</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="transportation">교통</string>
+    <string name="Attractions">장소</string>
+    <string name="Accommodation">숙소</string>
+</resources>
