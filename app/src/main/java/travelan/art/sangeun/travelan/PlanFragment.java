@@ -25,8 +25,10 @@ public class PlanFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_plan, container, false);
         setHasOptionsMenu(true);
+
+        View v = inflater.inflate(R.layout.fragment_plan, container, false);
+
         planList = v.findViewById(R.id.planList);
         calendarView = v.findViewById(R.id.calendarView);
 
@@ -36,8 +38,8 @@ public class PlanFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.toolbar_plan, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 }

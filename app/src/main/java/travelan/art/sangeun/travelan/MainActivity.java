@@ -3,9 +3,12 @@ package travelan.art.sangeun.travelan;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -15,8 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Toolbar toolbar;
     private TextView title;
-    private Menu menu;
-    private int menuSource;
+    private FragmentManager fragmentManager;
 
     private BottomNavigationView navigator;
 
@@ -30,13 +32,12 @@ public class MainActivity extends AppCompatActivity {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fragmentManager = getSupportFragmentManager();
+
         toolbar = findViewById(R.id.toolbar);
         title = toolbar.findViewById(R.id.title);
 
         navigator = findViewById(R.id.navigator);
-
-        menuSource = R.menu.toolbar_newspeed;
-
 
         this.setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -45,29 +46,21 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationViewHelper.disableShiftMode(navigator);
 
         readyFragement(FRAG_NEWSPEED);
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.clear();
-        getMenuInflater().inflate(menuSource, menu);
-        this.menu = menu;
-        return super.onCreateOptionsMenu(menu);
+        setToolbar(R.id.nav_newspeed);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
+            int itemId = item.getItemId();
+            setToolbar(itemId);
+            switch (itemId) {
                 case R.id.nav_newspeed:
                     readyFragement(FRAG_NEWSPEED);
-                    menuSource = R.menu.toolbar_newspeed;
                     return true;
                 case R.id.nav_plan:
                     readyFragement(FRAG_PLAN);
-                    menuSource = R.menu.toolbar_plan;
                     return true;
                 case R.id.nav_info:
                     readyFragement(FRAG_INFO);
@@ -76,39 +69,39 @@ public class MainActivity extends AppCompatActivity {
                     readyFragement(FRAG_SETTINGS);
                     return true;
             }
+
+
             return false;
         }
     };
 
-    private void readyFragement(String fragment) {
-        Fragment mFragment = getSupportFragmentManager().findFragmentByTag(fragment);
-        if (null == mFragment) {
-            if (fragment.equals(FRAG_NEWSPEED)) {
-                title.setText(R.string.nav_newspeed);
-                mFragment = new NewspeedFragment();
-            }
-            if (fragment.equals(FRAG_PLAN)) {
-                title.setText(R.string.nav_plan);
-                mFragment = new NewspeedFragment();
+    private void readyFragement(String fragmentTag) {
+        Fragment mFragment = fragmentManager.findFragmentByTag(fragmentTag);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            }
-            if (fragment.equals(FRAG_INFO)) {
-                title.setText(R.string.nav_info);
+        if (null == mFragment) {
+            if (fragmentTag.equals(FRAG_NEWSPEED)) {
                 mFragment = new NewspeedFragment();
             }
-            if (fragment.equals(FRAG_SETTINGS)) {
-                title.setText(R.string.nav_settings);
-                mFragment = new NewspeedFragment();
+            if (fragmentTag.equals(FRAG_PLAN)) {
+                mFragment = new PlanFragment();
             }
-        } else {
+            if (fragmentTag.equals(FRAG_INFO)) {
+                mFragment = new InfoFragment();
+            }
+            if (fragmentTag.equals(FRAG_SETTINGS)) {
+                mFragment = new SettingFragment();
+            }
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, mFragment, fragment).commit();
+
+        fragmentTransaction.replace(R.id.container, mFragment, fragmentTag).commit();
     }
 
-    private void setToolbar(int sort) {
-        switch (sort) {
+    private void setToolbar(int itemId) {
+        switch (itemId) {
             case R.id.nav_newspeed:
                 title.setText(R.string.nav_newspeed);
+
                 break;
             case R.id.nav_plan:
                 title.setText(R.string.nav_plan);
