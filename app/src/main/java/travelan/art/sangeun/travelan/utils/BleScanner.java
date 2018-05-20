@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +39,28 @@ public class BleScanner {
 
         final List<BluetoothDevice> scannedDevices = new ArrayList<>();
 
+        Log.i("SCAN_STARTED", "BLE");
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 btScanner.startScan(new ScanCallback() {
                     @Override
                     public void onScanResult(int callbackType, ScanResult result) {
+                        boolean isScanned = true;
+                        BluetoothDevice scannedDevice = result.getDevice();
+                        if (!scannedDevice.getName().equals("Travelan_01")) {
+                            return;
+                        }
+
                         for(int i = 0; i < scannedDevices.size(); i++) {
-                            if (!scannedDevices.get(i).getAddress().equals(result.getDevice().getAddress())) {
-                                scanListener.onScan(result.getDevice());
+                            if (scannedDevices.get(i).getAddress().equals(scannedDevice.getAddress())) {
+                                isScanned = false;
                             }
+                        }
+
+                        if (isScanned) {
+                            scannedDevices.add(result.getDevice());
+                            scanListener.onScan(result.getDevice());
                         }
                     }
 

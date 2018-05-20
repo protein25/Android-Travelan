@@ -2,6 +2,7 @@ package travelan.art.sangeun.travelan;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import travelan.art.sangeun.travelan.services.BleScanService;
 import travelan.art.sangeun.travelan.utils.BleScanner;
 
 
@@ -140,6 +142,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         checkPermission();
+
+        Intent intent = new Intent(getApplicationContext(), BleScanService.class);
+
+        if (isServiceRunning(BleScanService.class)) {
+            stopService(intent);
+        }
+
+        startService(intent);
     }
 
     @TargetApi(23)
@@ -184,5 +194,15 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
