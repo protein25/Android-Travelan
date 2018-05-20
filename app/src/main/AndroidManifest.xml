@@ -35,10 +35,10 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".services.AlarmReceiver"
+        <service
+            android:name=".services.BleScanService"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true"></service>
     </application>
 
 </manifest>
