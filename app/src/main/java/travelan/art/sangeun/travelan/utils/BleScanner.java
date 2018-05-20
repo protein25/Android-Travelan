@@ -1,0 +1,83 @@
+package travelan.art.sangeun.travelan.utils;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
+import android.content.Context;
+import android.os.AsyncTask;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class BleScanner {
+    private static BluetoothManager btManager;
+    private static BluetoothAdapter btAdapter;
+    private static BluetoothLeScanner btScanner;
+    private static boolean isScanning = false;
+
+    public static final void init(Context context) {
+        btManager = (BluetoothManager)context.getSystemService(Context.BLUETOOTH_SERVICE);
+        btAdapter = btManager.getAdapter();
+        btScanner = btAdapter.getBluetoothLeScanner();
+    }
+
+    public static final boolean isBluetoothEnabled() {
+        return btAdapter != null && !btAdapter.isEnabled();
+    }
+
+    public static final void startScan(final BleScanListener scanListener) {
+        if (isScanning) {
+            scanListener.onError(ScanCallback.SCAN_FAILED_ALREADY_STARTED);
+            return;
+        }
+
+        isScanning = true;
+
+        final List<BluetoothDevice> scannedDevices = new ArrayList<>();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                btScanner.startScan(new ScanCallback() {
+                    @Override
+                    public void onScanResult(int callbackType, ScanResult result) {
+                        for(int i = 0; i < scannedDevices.size(); i++) {
+                            if (!scannedDevices.get(i).getAddress().equals(result.getDevice().getAddress())) {
+                                scanListener.onScan(result.getDevice());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onScanFailed(int errorCode) {
+                        // errorCodes: https://developer.android.com/reference/android/bluetooth/le/ScanCallback
+                        scanListener.onError(errorCode);
+                    }
+                });
+            }
+        });
+    }
+
+    public static final void stopScan() {
+        if (!isScanning) {
+            return;
+        }
+
+        isScanning = false;
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                btScanner.stopScan(new ScanCallback() {
+                    @Override
+                    public void onScanResult(int callbackType, ScanResult result) {
+                        super.onScanResult(callbackType, result);
+                    }
+                });
+            }
+        });
+    }
+}
