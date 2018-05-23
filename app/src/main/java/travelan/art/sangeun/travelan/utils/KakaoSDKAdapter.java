@@ -2,16 +2,30 @@ package travelan.art.sangeun.travelan.utils;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.kakao.auth.ApiResponseCallback;
+import com.kakao.auth.ApprovalType;
+import com.kakao.auth.AuthType;
+import com.kakao.auth.IApplicationConfig;
 import com.kakao.auth.IPushConfig;
+import com.kakao.auth.ISessionConfig;
+import com.kakao.auth.KakaoAdapter;
+import com.kakao.auth.Session;
 import com.kakao.network.ErrorResult;
 import com.kakao.util.helper.SharedPreferencesCache;
 import com.kakao.util.helper.log.Logger;
 
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
+
+import travelan.art.sangeun.travelan.TravelanApplication;
+
 public class KakaoSDKAdapter extends KakaoAdapter {
     protected static final String PROPERTY_DEVICE_ID = "device_id";
+
     /**
      * Session Config에 대해서는 default값들이 존재한다.
      * 필요한 상황에서만 override해서 사용하면 됨.
@@ -52,7 +66,7 @@ public class KakaoSDKAdapter extends KakaoAdapter {
         return new IApplicationConfig() {
             @Override
             public Context getApplicationContext() {
-                return GlobalApplication.getGlobalApplicationContext();
+                return TravelanApplication.getGlobalApplicationContext();
             }
         };
     }
@@ -89,6 +103,8 @@ public class KakaoSDKAdapter extends KakaoAdapter {
                         }
                     } catch (UnsupportedEncodingException e) {
                         throw new RuntimeException(e);
+                    } catch (SecurityException e) {
+                        throw new RuntimeException(e);
                     }
 
                     Bundle bundle = new Bundle();
@@ -105,7 +121,7 @@ public class KakaoSDKAdapter extends KakaoAdapter {
                 return new ApiResponseCallback<Integer>() {
                     @Override
                     public void onFailure(ErrorResult errorResult) {
-                        KakaoToast.makeToast(getApplicationConfig().getApplicationContext(), errorResult.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationConfig().getApplicationContext(), errorResult.toString(), Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -121,7 +137,7 @@ public class KakaoSDKAdapter extends KakaoAdapter {
 
                     @Override
                     public void onSuccess(Integer result) {
-                        KakaoToast.makeToast(getApplicationConfig().getApplicationContext(), "succeeded to register fcm token...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationConfig().getApplicationContext(), "succeeded to register fcm token...", Toast.LENGTH_SHORT).show();
                     }
                 };
             }
