@@ -95,5 +95,6 @@ public class BleScanService extends Service {
 
     public void reportDeviceLocation(BluetoothDevice device) {
         Log.i("BLE SCANNED", device.getAddress());
+
     }
 }

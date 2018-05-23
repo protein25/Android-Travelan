@@ -38,7 +38,10 @@
         <service
             android:name=".services.BleScanService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".CommentActivity" />
+        <activity android:name=".WriteNewsfeedActivity"></activity>
     </application>
 
 </manifest>
