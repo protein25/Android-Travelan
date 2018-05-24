@@ -8,18 +8,18 @@ import android.widget.Toast;
 
 import com.kakao.auth.ApiErrorCode;
 import com.kakao.auth.ApiResponseCallback;
+import com.kakao.auth.AuthService;
 import com.kakao.auth.ISessionCallback;
-import com.kakao.auth.KakaoSDK;
 import com.kakao.auth.Session;
+import com.kakao.auth.network.response.AccessTokenInfoResponse;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
 import com.kakao.util.OptionalBoolean;
 import com.kakao.util.exception.KakaoException;
 import com.kakao.util.helper.log.Logger;
-
-import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
     private SessionCallback callback;
@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        KakaoSDK.init(new KakaoSDKAdapter());
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
         Session.getCurrentSession().checkAndImplicitOpen();
@@ -49,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onSessionOpened() {
-
+            getMe();
         }
 
         @Override
@@ -83,7 +82,12 @@ public class LoginActivity extends AppCompatActivity {
                     if (result.hasSignedUp() == OptionalBoolean.FALSE) {
                         signUp();
                     } else {
-                        Log.i("KAKAO_LOGIN_SUCCESS", result.toString());
+                        Toast.makeText(getApplicationContext(), "LOGIN_SUCCESS", Toast.LENGTH_SHORT).show();
+                        // getAccessToken 을 서버에 보내서 해당 정보로 가입 / 로그인 하도록 구성.
+                        // logout: https://developers.kakao.com/docs/android/user-management#로그아웃
+                        // server token info: https://developers.kakao.com/docs/restapi/user-management#사용자-토큰-유효성-검사-및-정보-얻기
+                        String token = Session.getCurrentSession().getTokenInfo().getAccessToken();
+                        Log.i("KAKAO_LOGIN_SUCCESS", result.toString() + "token: " + token);
                     }
                 }
             });
@@ -103,9 +107,40 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onSuccess(Long result) {
+                    Toast.makeText(getApplicationContext(), "SIGN_UP_SUCCESS", Toast.LENGTH_SHORT).show();
                     getMe();
                 }
             }, null);
         }
+
+        private void requestAccessTokenInfo() {
+            AuthService.getInstance().requestAccessTokenInfo(new ApiResponseCallback<AccessTokenInfoResponse>() {
+                @Override
+                public void onSessionClosed(ErrorResult errorResult) {
+                    Toast.makeText(getApplicationContext(), "SESSION_CLOSED", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onNotSignedUp() {
+                    // not happened
+                }
+
+                @Override
+                public void onFailure(ErrorResult errorResult) {
+                    Logger.e("failed to get access token info. msg=" + errorResult);
+                }
+
+                @Override
+                public void onSuccess(AccessTokenInfoResponse accessTokenInfoResponse) {
+                    long userId = accessTokenInfoResponse.getUserId();
+                    Logger.d("this access token is for userId=" + userId);
+
+                    long expiresInMilis = accessTokenInfoResponse.getExpiresInMillis();
+                    Logger.d("this access token expires after " + expiresInMilis + " milliseconds.");
+                }
+            });
+        }
+
+
     }
 }
