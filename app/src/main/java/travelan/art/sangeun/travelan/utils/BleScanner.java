@@ -48,7 +48,7 @@ public class BleScanner {
                     public void onScanResult(int callbackType, ScanResult result) {
                         boolean isScanned = true;
                         BluetoothDevice scannedDevice = result.getDevice();
-                        if (!scannedDevice.getName().equals("Travelan_01")) {
+                        if (scannedDevice.getName() != null || !scannedDevice.getName().equals("Travelan")) {
                             return;
                         }
 

@@ -1,5 +1,6 @@
 package travelan.art.sangeun.travelan;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,12 +24,14 @@ import com.kakao.util.helper.log.Logger;
 
 public class LoginActivity extends AppCompatActivity {
     private SessionCallback callback;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        context = this;
 
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
@@ -88,6 +91,9 @@ public class LoginActivity extends AppCompatActivity {
                         // server token info: https://developers.kakao.com/docs/restapi/user-management#사용자-토큰-유효성-검사-및-정보-얻기
                         String token = Session.getCurrentSession().getTokenInfo().getAccessToken();
                         Log.i("KAKAO_LOGIN_SUCCESS", result.toString() + "token: " + token);
+                        Intent intent = new Intent(context, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
                     }
                 }
             });
@@ -140,7 +146,5 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
-
-
     }
 }
