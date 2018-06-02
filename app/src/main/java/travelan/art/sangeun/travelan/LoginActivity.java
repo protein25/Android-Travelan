@@ -22,6 +22,8 @@ import com.kakao.util.OptionalBoolean;
 import com.kakao.util.exception.KakaoException;
 import com.kakao.util.helper.log.Logger;
 
+import travelan.art.sangeun.travelan.utils.ApiClient;
+
 public class LoginActivity extends AppCompatActivity {
     private SessionCallback callback;
     private Context context;
@@ -91,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                         // server token info: https://developers.kakao.com/docs/restapi/user-management#사용자-토큰-유효성-검사-및-정보-얻기
                         String token = Session.getCurrentSession().getTokenInfo().getAccessToken();
                         Log.i("KAKAO_LOGIN_SUCCESS", result.toString() + "token: " + token);
+                        ApiClient.setToken(token);
                         Intent intent = new Intent(context, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);

@@ -6,14 +6,41 @@ import com.loopj.android.http.RequestParams;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
+//    private static final String HOST_URL = "http://18.191.11.177:3000";
+    private static final String HOST_URL = "http://192.168.1.29:3000";
+    private static String token = "";
 
-    private static final String HOST_URL = "http://18.191.11.177:3000/";
+    static public void setToken(String token) {
+        ApiClient.token = token;
+    }
 
-    public void login(String userId, String password, AsyncHttpResponseHandler httpHandler) {
+    static public void get(String url, RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
+        httpClient.addHeader("accessToken", token);
+        httpClient.get(HOST_URL + url, params, httpResponseHandler);
+    }
+
+    static public void post(String url, RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
+        httpClient.addHeader("accessToken", token);
+        httpClient.post(HOST_URL + url, params, httpResponseHandler);
+    }
+
+    static public void login(String userId, String password, AsyncHttpResponseHandler httpHandler) {
         RequestParams params = new RequestParams();
         params.put("userId", userId);
         params.put("password", "password");
 
-        httpClient.post("/members/login", params, httpHandler);
+        ApiClient.post("/members/login", params, httpHandler);
+    }
+
+    static public void getNewspeeds(int page, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("page", page);
+        ApiClient.get("/newspeed", params, httpResponseHandler);
+    }
+
+    static public void getInformations(int page, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("page", page);
+        ApiClient.get("/informations", params, httpResponseHandler);
     }
 }
