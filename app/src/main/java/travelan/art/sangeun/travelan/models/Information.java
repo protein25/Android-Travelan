@@ -1,10 +1,10 @@
 package travelan.art.sangeun.travelan.models;
 
-public class Infomation {
+public class Information {
     public String countryName;
     public String wrtDt;
     public String title ;
-    public String fileUrl;
+    public String flagImage;
     public String content;
 
     public String toString(){

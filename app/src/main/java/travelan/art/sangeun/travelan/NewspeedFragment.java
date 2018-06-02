@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +39,7 @@ public class NewspeedFragment extends Fragment {
 
         List<Newspeed> items = makeDummy(); // 이후  api에서 비동기로 처리 하도록 수정 필요
         Log.i("item size", Integer.toString(items.size()));
+
         NewspeedListAdapter adapter = new NewspeedListAdapter(getContext(), items);
         newspeedList.setLayoutManager(new LinearLayoutManager(getContext()));
         newspeedList.setItemAnimator(new DefaultItemAnimator());
