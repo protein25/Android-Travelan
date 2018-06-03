@@ -1,5 +1,7 @@
 package travelan.art.sangeun.travelan.utils;
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -15,21 +17,22 @@ public class ApiClient {
     }
 
     static public void get(String url, RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
-        httpClient.addHeader("accessToken", token);
+        httpClient.addHeader("accessToken", ApiClient.token);
         httpClient.get(HOST_URL + url, params, httpResponseHandler);
     }
 
     static public void post(String url, RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
-        httpClient.addHeader("accessToken", token);
+        Log.i("ACCESS TOKEN", ApiClient.token);
+        httpClient.addHeader("access-token", ApiClient.token);
         httpClient.post(HOST_URL + url, params, httpResponseHandler);
     }
 
-    static public void login(String userId, String password, AsyncHttpResponseHandler httpHandler) {
-        RequestParams params = new RequestParams();
-        params.put("userId", userId);
-        params.put("password", "password");
+    static public void login(AsyncHttpResponseHandler httpHandler) {
+        ApiClient.post("/members/login", null, httpHandler);
+    }
 
-        ApiClient.post("/members/login", params, httpHandler);
+    static public void join(RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.post("/members/join", params, httpResponseHandler);
     }
 
     static public void getNewspeeds(int page, AsyncHttpResponseHandler httpResponseHandler) {

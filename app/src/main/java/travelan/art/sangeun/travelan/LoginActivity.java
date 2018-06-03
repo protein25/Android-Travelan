@@ -21,7 +21,13 @@ import com.kakao.usermgmt.response.MeV2Response;
 import com.kakao.util.OptionalBoolean;
 import com.kakao.util.exception.KakaoException;
 import com.kakao.util.helper.log.Logger;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.utils.ApiClient;
 
 public class LoginActivity extends AppCompatActivity {
@@ -64,7 +70,12 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         public void getMe() {
-            UserManagement.getInstance().me(new MeV2ResponseCallback() {
+            List<String> keys = new ArrayList<>();
+            keys.add("properties.nickname");
+            keys.add("properties.profile_image");
+            keys.add("kakao_account.email");
+
+            UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
                 @Override
                 public void onFailure(ErrorResult errorResult) {
                     String message = "failed to get user info. msg=" + errorResult;
@@ -83,20 +94,50 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onSuccess(MeV2Response result) {
+                public void onSuccess(final MeV2Response result) {
                     if (result.hasSignedUp() == OptionalBoolean.FALSE) {
                         signUp();
                     } else {
-                        Toast.makeText(getApplicationContext(), "LOGIN_SUCCESS", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "KAKAO LINKED", Toast.LENGTH_SHORT).show();
                         // getAccessToken 을 서버에 보내서 해당 정보로 가입 / 로그인 하도록 구성.
                         // logout: https://developers.kakao.com/docs/android/user-management#로그아웃
                         // server token info: https://developers.kakao.com/docs/restapi/user-management#사용자-토큰-유효성-검사-및-정보-얻기
                         String token = Session.getCurrentSession().getTokenInfo().getAccessToken();
-                        Log.i("KAKAO_LOGIN_SUCCESS", result.toString() + "token: " + token);
+                        Log.i("KAKAO_LOGIN_SUCCESS", result.toString());
                         ApiClient.setToken(token);
-                        Intent intent = new Intent(context, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        startActivity(intent);
+
+                        ApiClient.login(new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                Toast.makeText(getApplicationContext(), "LOGIN SUCCESS", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(context, MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                if (statusCode == 401) {
+                                    String name = result.getNickname();
+                                    String thumbnail = result.getProfileImagePath();
+                                    String email = result.getKakaoAccount().getEmail();
+
+                                    Intent intent = new Intent(context, RegisterActivity.class);
+                                    intent.putExtra("name", name);
+                                    intent.putExtra("thumbnail", thumbnail);
+                                    intent.putExtra("email", email);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    startActivity(intent);
+                                } else {
+                                    try {
+                                        Log.e("LOGIN ERROR", new String(responseBody, "UTF-8"));
+                                    } catch (UnsupportedEncodingException e) {
+                                        Log.e("ENCODE ERROR", e.getMessage());
+                                    }
+                                    Toast.makeText(context, "LOGIN ERROR", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }
             });
