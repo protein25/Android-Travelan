@@ -8,8 +8,8 @@ import com.loopj.android.http.RequestParams;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
-//    private static final String HOST_URL = "http://18.191.11.177:3000";
-    private static final String HOST_URL = "http://192.168.1.29:3000";
+    private static final String HOST_URL = "http://18.191.11.177:3000";
+//    private static final String HOST_URL = "http://192.168.1.29:3000";
     private static String token = "";
 
     static public void setToken(String token) {
@@ -45,5 +45,12 @@ public class ApiClient {
         RequestParams params = new RequestParams();
         params.put("page", page);
         ApiClient.get("/informations", params, httpResponseHandler);
+    }
+
+    static public void getLocations(int memberId, AsyncHttpResponseHandler httpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("memberId",memberId);
+
+        ApiClient.post("/locations",params,httpResponseHandler);
     }
 }

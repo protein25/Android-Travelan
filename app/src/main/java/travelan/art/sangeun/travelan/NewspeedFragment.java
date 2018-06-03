@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -71,7 +70,7 @@ public class NewspeedFragment extends Fragment {
 
                         Newspeed item = new Newspeed();
                         item.location = "#FUKUOKA";
-                        item.isFav = true;
+                        item.isFav = false;
                         item.contents = object.getString("content");
 
                         item.images = new ArrayList<>();

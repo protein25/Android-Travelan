@@ -61,6 +61,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".WriteNewspeedActivity"></activity>
     </application>
 
 </manifest>
