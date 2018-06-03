@@ -43,4 +43,11 @@ public class ApiClient {
         params.put("page", page);
         ApiClient.get("/informations", params, httpResponseHandler);
     }
+
+    static public void getLocations(int memberId, AsyncHttpResponseHandler httpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("memberId",memberId);
+
+        ApiClient.post("/locations",params,httpResponseHandler);
+    }
 }
