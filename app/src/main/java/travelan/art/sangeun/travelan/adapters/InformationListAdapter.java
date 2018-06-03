@@ -49,7 +49,7 @@ public class InformationListAdapter extends RecyclerView.Adapter {
         mViewHolder.expandableTextView.setText(item.content);
 
         if (item.flagImage!=null) {
-//        Picasso.get().load(item.flagImage).into(mViewHolder.flag);
+        Picasso.get().load(item.flagImage).into(mViewHolder.flag);
         }
     }
 
