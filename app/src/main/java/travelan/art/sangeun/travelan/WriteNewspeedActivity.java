@@ -1,5 +1,9 @@
 package travelan.art.sangeun.travelan;
 
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,12 +13,20 @@ import android.widget.ImageButton;
 
 import com.synnapps.carouselview.CarouselView;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.List;
+
+import travelan.art.sangeun.travelan.dialog.SelectLocationDialog;
+
 public class WriteNewspeedActivity extends AppCompatActivity {
     private static final String TAG = "WriteNewspeedActivity";
+    private int memberId;//memberId유지하는 거 몰라서 이렇게 선언해놨음
     private Button location;
     private CarouselView photoSlide;
     private EditText writeContet;
     private ImageButton selectPhoto;
+    private String selectedLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +47,7 @@ public class WriteNewspeedActivity extends AppCompatActivity {
 
     //여행 선택 dialog method
     private void selectLocation(){
-
-
+        SelectLocationDialog dialog = SelectLocationDialog.newInstance(memberId);
+        dialog.show(getSupportFragmentManager(),"selectLocationDialog");
     }
 }

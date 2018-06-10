@@ -13,7 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 import travelan.art.sangeun.travelan.R;
 
-public class MapLocationDialog extends DialogFragment implements OnMapReadyCallback{
+public class MapLocationDialog extends DialogFragment implements OnMapReadyCallback {
     private MapView map;
 
     @Nullable

@@ -31,7 +31,10 @@ public class ApiClient {
         ApiClient.post("/members/login", null, httpHandler);
     }
 
-    static public void join(RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
+    static public void join(RequestParams params, AsyncHttpResponseHandler httpResponseHandler)
+
+
+    {
         ApiClient.post("/members/join", params, httpResponseHandler);
     }
 
