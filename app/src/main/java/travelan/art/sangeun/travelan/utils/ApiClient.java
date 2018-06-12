@@ -8,8 +8,8 @@ import com.loopj.android.http.RequestParams;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
-    private static final String HOST_URL = "http://18.191.11.177:3000";
-//    private static final String HOST_URL = "http://192.168.1.29:3000";
+//    private static final String HOST_URL = "http://18.191.11.177:3000";
+    private static final String HOST_URL = "http://172.30.1.20:3000";
     private static String token = "";
 
     static public void setToken(String token) {
@@ -52,5 +52,13 @@ public class ApiClient {
         params.put("memberId",memberId);
 
         ApiClient.post("/locations",params,httpResponseHandler);
+    }
+
+    static public void getMonthTravel(int year, int month, AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.get("/travel/" + year + "/" + month , null, httpResponseHandler);
+    }
+
+    static public void getDatePlan(int year, int month, int day, AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.get("/plan/" + year + "/" + month + "/" + day, null, httpResponseHandler);
     }
 }

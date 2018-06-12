@@ -10,6 +10,7 @@ public class Plan {
     public String route;
     public String destination;
     public String label;
+    public String attributeType;
 
     public String toString(){
         return "title : "+title+"address : "+address ;

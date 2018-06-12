@@ -1,6 +1,5 @@
 package travelan.art.sangeun.travelan.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,11 +22,9 @@ import travelan.art.sangeun.travelan.models.Newspeed;
 
 public class NewspeedListAdapter extends RecyclerView.Adapter{
     private List<Newspeed> items;
-    private Context context;
 
-    public NewspeedListAdapter (Context context, List<Newspeed> items) {
+    public NewspeedListAdapter (List<Newspeed> items) {
         this.items = items;
-        this.context = context;
     }
 
     @NonNull
