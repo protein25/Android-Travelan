@@ -4,5 +4,5 @@
     <item android:id="@+id/addPlan"
         android:title="add"
         app:showAsAction="always"
-        android:icon="@drawable/ic_add_black_24dp"/>
+        android:icon="@drawable/ic_done_black_24dp"/>
 </menu>
