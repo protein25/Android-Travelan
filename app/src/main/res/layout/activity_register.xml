@@ -12,8 +12,9 @@
     <ImageView
         android:id="@+id/userThumb"
         android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:padding="50dp"
+        android:layout_height="200dp"
+        android:padding="45dp"
+        android:background="@drawable/gray_border"
         android:src="@mipmap/ic_launcher_round"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -24,23 +25,21 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/userThumb">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/idInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="ID" />
-
-
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
         android:id="@+id/nameInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/idInputLayout"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/idInputLayout">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/nameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,19 +49,33 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/ageInputLayout"
         android:layout_width="match_parent"
-        android:id="@+id/dateInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/nameInputLayout"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/nameInputLayout">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/ageInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="생년월일"
-            android:inputType="date"
-            />
+            android:inputType="date" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/emergencyInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/ageInputLayout">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/emergencyInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="비상연락망"
+            android:inputType="phone"/>
     </android.support.design.widget.TextInputLayout>
 
     <TextView
@@ -70,23 +83,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        app:layout_constraintHorizontal_weight="1"
         android:text="성별"
         android:textSize="20sp"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateInputLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/emergencyInputLayout" />
 
 
     <RadioGroup
         android:id="@+id/sexInput"
         android:layout_width="0dp"
+        android:background="@drawable/gray_border"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="horizontal"
-        app:layout_constraintHorizontal_weight="4"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="4"
         app:layout_constraintStart_toEndOf="@+id/sexText"
-        app:layout_constraintTop_toBottomOf="@id/dateInputLayout">
+        app:layout_constraintTop_toBottomOf="@id/emergencyInputLayout">
 
         <RadioButton
             android:id="@+id/sexFemale"
@@ -112,5 +126,6 @@
         android:background="@color/colorPrimary"
         android:text="REGISTER"
         app:layout_constraintBottom_toBottomOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>
