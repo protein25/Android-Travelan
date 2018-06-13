@@ -6,6 +6,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import travelan.art.sangeun.travelan.models.Plan;
+
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
 //    private static final String HOST_URL = "http://18.191.11.177:3000";
@@ -64,6 +69,31 @@ public class ApiClient {
 
     static public void getDatePlan(int year, int month, int day, AsyncHttpResponseHandler httpResponseHandler) {
         ApiClient.get("/plan/" + year + "/" + month + "/" + day, null, httpResponseHandler);
+    }
+
+    static public void addTravel(String title, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("title", title);
+        ApiClient.post("/travel", params, httpResponseHandler);
+    }
+
+    static public void addPlan(Plan plan, Date date, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        params.put("sort", plan.attributeType);
+        params.put("date", cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DAY_OF_MONTH));
+        params.put("travelId", plan.travelId);
+        params.put("title", plan.title);
+        params.put("address", plan.address);
+        params.put("time", plan.time);
+        params.put("origin", plan.origin);
+        params.put("destination", plan.destination);
+        params.put("way", plan.way);
+        params.put("route", plan.route);
+        params.put("order", plan.order);
+
+        ApiClient.post("/plan/write", params, httpResponseHandler);
     }
 
     static public void findLocation(String keyword, AsyncHttpResponseHandler httpResponseHandler) {

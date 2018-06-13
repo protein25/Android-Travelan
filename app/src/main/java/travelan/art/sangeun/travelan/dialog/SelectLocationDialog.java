@@ -41,7 +41,7 @@ public class SelectLocationDialog extends DialogFragment {
         SelectLocationDialog dialog = new SelectLocationDialog();
         items = new ArrayList<>();
 
-        ApiClient.getLocations(memberId,new JsonHttpResponseHandler(){
+        ApiClient.getLocations(memberId, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 try {

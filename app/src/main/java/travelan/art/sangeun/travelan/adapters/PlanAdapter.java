@@ -6,13 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
 
+import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.PlanFragment;
 import travelan.art.sangeun.travelan.R;
+import travelan.art.sangeun.travelan.dialog.SelectTravelDialog;
 import travelan.art.sangeun.travelan.models.MapLocation;
 import travelan.art.sangeun.travelan.dialog.MapLocationDialog;
+import travelan.art.sangeun.travelan.utils.ApiClient;
 import travelan.art.sangeun.travelan.utils.OnMapSelectListener;
 import travelan.art.sangeun.travelan.models.Plan;
 
@@ -49,7 +58,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Plan item = items.get(position);
+        final Plan item = items.get(position);
         int viewType = getItemViewType(position);
 
         if (viewType == ATTRIBUTE_ADD) {
@@ -57,19 +66,11 @@ public class PlanAdapter extends RecyclerView.Adapter {
             viewHolder.add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    planFragment.openAttributeSelect(new BottomSheetListener() {
-                        @Override
-                        public void onSelect(int id) {
-                            MapLocationDialog mapLocationDialog = new MapLocationDialog();
-                            mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
-                                @Override
-                                public void onSelect(MapLocation mapLocation) {
-
-                                }
-                            });
-                            mapLocationDialog.show(planFragment.getFragmentManager(), "mapLocationDialog");
-                        }
-                    });
+                    if (item.travelId < 0) {
+                        selectTravel(item);
+                    } else {
+                        addPlan(item);
+                    }
                 }
             });
         } else if (viewType == ATTRIBUTE_TRANSPORT) {
@@ -83,7 +84,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
             ViewHolderCommon viewHolder = (ViewHolderCommon) holder;
             viewHolder.title.setText(item.title);
             viewHolder.address.setText(item.address);
-            viewHolder.tel.setText(item.tel);
         }
     }
 
@@ -107,6 +107,51 @@ public class PlanAdapter extends RecyclerView.Adapter {
         return items.size();
     }
 
+    public void selectTravel(final Plan item) {
+        final SelectTravelDialog selectTravelDialog = new SelectTravelDialog();
+        selectTravelDialog.init(planFragment.getNearByTravel(), new SelectTravelAdapter.OnTravelSelectListener() {
+            @Override
+            public void onSelect(int travelId) {
+                selectTravelDialog.dismiss();
+                item.travelId = travelId;
+                addPlan(item);
+            }
+        });
+
+        selectTravelDialog.show(planFragment.getFragmentManager(), "selectTravelDialog");
+    }
+
+    public void addPlan(final Plan item) {
+        planFragment.openAttributeSelect(new BottomSheetListener() {
+            @Override
+            public void onSelect(final int id) {
+                final MapLocationDialog mapLocationDialog = new MapLocationDialog();
+                mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
+                    @Override
+                    public void onSelect(MapLocation mapLocation) {
+                        item.setAttributeTypeById(id);
+                        item.title = mapLocation.poi;
+                        item.address = mapLocation.address;
+
+                        ApiClient.addPlan(item, planFragment.selectedDate, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                mapLocationDialog.dismiss();
+                                planFragment.getMonthTravel(planFragment.selectedDate);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                Toast.makeText(planFragment.getContext(), "FAIL TO WRITE PLAN", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+                mapLocationDialog.show(planFragment.getFragmentManager(), "mapLocationDialog");
+            }
+        });
+    }
+
     class ViewHolderAdd extends RecyclerView.ViewHolder {
         TextView add;
 
@@ -117,13 +162,12 @@ public class PlanAdapter extends RecyclerView.Adapter {
     }
 
     class ViewHolderCommon extends RecyclerView.ViewHolder {
-        TextView title, address, tel;
+        TextView title, address;
 
         public ViewHolderCommon(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.title);
-            address = itemView.findViewById(R.id.address);
-            tel = itemView.findViewById(R.id.tel);
+            title = itemView.findViewById(R.id.planTitle);
+            address = itemView.findViewById(R.id.planAddress);
         }
     }
 

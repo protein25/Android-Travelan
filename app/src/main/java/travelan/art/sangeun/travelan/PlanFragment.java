@@ -34,7 +34,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.adapters.BottomSheetListener;
@@ -58,6 +60,7 @@ public class PlanFragment extends Fragment {
     private LinearLayout attributeAttraction;
     private LinearLayout attributeAccommodate;
     private FrameLayout selectBackground;
+    public Date selectedDate = new Date();
 
     @Nullable
     @Override
@@ -81,6 +84,7 @@ public class PlanFragment extends Fragment {
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
+                selectedDate = dateClicked;
                 doneEditPlans();
                 getDatePlans(dateClicked);
             }
@@ -133,7 +137,7 @@ public class PlanFragment extends Fragment {
         }
     }
 
-    private void getMonthTravel(Date date) {
+    public void getMonthTravel(final Date date) {
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -146,17 +150,22 @@ public class PlanFragment extends Fragment {
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject travelObj = response.getJSONObject(i);
+                        int id = travelObj.getInt("id");
                         String title = travelObj.getString("title");
                         JSONArray dates = travelObj.getJSONArray("dates");
                         for(int j = 0; j < dates.length(); j++) {
-                            calendarView.addEvent(new Event(Color.GRAY, dates.getLong(j), title));
+                            Map<String, String> map = new HashMap<>();
+                            map.put("id", ""+id);
+                            map.put("title", title);
+
+                            calendarView.addEvent(new Event(Color.GRAY, dates.getLong(j), map));
                         }
                     }
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "FAIL TO PARSE MONTH TRAVEL", Toast.LENGTH_SHORT).show();
                 }
 
-                getDatePlans(new Date());
+                getDatePlans(date);
             }
 
             @Override
@@ -166,7 +175,7 @@ public class PlanFragment extends Fragment {
         });
     }
 
-    private void getDatePlans(Date date) {
+    public void getDatePlans(Date date) {
         adapter.items.clear();
         adapter.notifyDataSetChanged();
 
@@ -175,7 +184,9 @@ public class PlanFragment extends Fragment {
             return;
         }
 
-        String travelTitle = events.get(0).getData().toString();
+        Map<String, String> data = (HashMap) events.get(0).getData();
+        final int travelId = Integer.parseInt(data.get("id"));
+        String travelTitle = data.get("title");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(travelTitle);
 
         calendar.setTime(date);
@@ -193,6 +204,7 @@ public class PlanFragment extends Fragment {
                         JSONObject object = response.getJSONObject(i);
                         String attributeType = object.getString("attributeType");
                         Plan plan = new Plan();
+                        plan.travelId = travelId;
                         plan.id = object.getInt("id");
                         plan.order = object.getDouble("order");
                         plan.attributeType = attributeType;
@@ -206,7 +218,6 @@ public class PlanFragment extends Fragment {
                         } else {
                             plan.title = object.getString("title");
                             plan.address = object.getString("address");
-                            plan.tel = object.getString("tel");
                         }
 
                         plans.add(plan);
@@ -214,6 +225,8 @@ public class PlanFragment extends Fragment {
 
                     adapter.items = plans;
                     adapter.notifyDataSetChanged();
+
+                    if (!addBtn.isShown()) editPlans();
                 } catch (JSONException e) {
                     Log.i("FAIL TO PARSE", e.getMessage());
                     Toast.makeText(getContext(), "FAIL TO PARSE DATE PLANS", Toast.LENGTH_SHORT).show();
@@ -231,15 +244,21 @@ public class PlanFragment extends Fragment {
         List<Plan> editablePlans = new ArrayList<>();
         List<Plan> plans = adapter.items;
 
-        double firstOrder = plans.size() > 0 ? plans.get(0).order - 2 : 0;
+        double firstOrder = 0;
+        int travelId = -1;
 
-        editablePlans.add(Plan.getAddInstance(firstOrder));
+        if (plans.size() > 0) {
+            firstOrder = plans.get(0).order - 2;
+            travelId = plans.get(0).travelId;
+        }
+
+        editablePlans.add(Plan.getAddInstance(travelId, firstOrder));
 
         for(int i = 0; i < plans.size(); i++) {
             Plan plan = plans.get(i);
             editablePlans.add(plans.get(i));
             double nextOrder = i + 1 < plans.size() ? (plan.order + plans.get(i + 1).order) / 2 : plan.order + 2;
-            editablePlans.add(Plan.getAddInstance(nextOrder));
+            editablePlans.add(Plan.getAddInstance(travelId, nextOrder));
         }
 
         adapter.items = editablePlans;
@@ -277,5 +296,29 @@ public class PlanFragment extends Fragment {
         attributeAttraction.setOnClickListener(clickListener);
 
         selectAttributeType.setVisibility(View.VISIBLE);
+    }
+
+    public List<Object> getNearByTravel() {
+        List<Object> nearBy = new ArrayList<>();
+
+        calendar.setTime(selectedDate);
+
+        calendar.add(Calendar.DATE, -1);
+        Date yesterday = new Date(calendar.getTimeInMillis());
+        List<Event> yesterdayEvents = calendarView.getEvents(yesterday);
+
+        if (yesterdayEvents.size() > 0) {
+            nearBy.add(yesterdayEvents.get(0).getData());
+        }
+
+        calendar.add(Calendar.DATE, 2);
+        Date tomorrow = new Date(calendar.getTimeInMillis());
+        List<Event> tomorrowEvents = calendarView.getEvents(tomorrow);
+
+        if (tomorrowEvents.size() > 0) {
+            nearBy.add(tomorrowEvents.get(0).getData());
+        }
+
+        return nearBy;
     }
 }

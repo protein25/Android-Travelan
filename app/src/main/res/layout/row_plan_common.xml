@@ -11,7 +11,7 @@
         android:background="@color/colorAccent">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/planTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
@@ -20,24 +20,14 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/address"
+            android:id="@+id/planAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:hint="address"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="25sp"
-            app:layout_constraintTop_toBottomOf="@id/title" />
-
-        <TextView
-            android:id="@+id/tel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:hint="032)467-5805"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@id/address" />
+            app:layout_constraintTop_toBottomOf="@id/planTitle" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>
