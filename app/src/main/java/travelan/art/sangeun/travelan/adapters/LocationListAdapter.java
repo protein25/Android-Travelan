@@ -1,6 +1,5 @@
 package travelan.art.sangeun.travelan.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import travelan.art.sangeun.travelan.R;
+import travelan.art.sangeun.travelan.dialog.OnLocationSelectListener;
 
 /**
  * Created by sangeun on 2018-06-03.
@@ -18,11 +18,14 @@ import travelan.art.sangeun.travelan.R;
 
 public class LocationListAdapter extends RecyclerView.Adapter {
     private List<String> list;
-    private Context context;
+    private OnLocationSelectListener selectListener;
 
-    public LocationListAdapter(List list, Context context){
+    public LocationListAdapter(List list){
         this.list = list;
-        this.context = context;
+    }
+
+    public void setOnLocationSelectListener(OnLocationSelectListener selectListener){
+        this.selectListener = selectListener;
     }
 
     @NonNull
@@ -33,10 +36,18 @@ public class LocationListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         ViewHolder mViewHolder = (ViewHolder)holder;
         mViewHolder.listText.setText(list.get(position));
+        mViewHolder.listText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectListener.onItemClick(list.get(position));
+            }
+        });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -50,5 +61,9 @@ public class LocationListAdapter extends RecyclerView.Adapter {
             listText = itemView.findViewById(R.id.listText);
         }
     }
+
+
+
+
 
 }

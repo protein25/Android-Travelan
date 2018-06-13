@@ -37,11 +37,11 @@ public class SelectLocationDialog extends DialogFragment {
     private LocationListAdapter adapter;
     private static List<String> items;
 
-    public static SelectLocationDialog newInstance(int memberId){
+    public static SelectLocationDialog newInstance(){
         SelectLocationDialog dialog = new SelectLocationDialog();
         items = new ArrayList<>();
 
-        ApiClient.getLocations(memberId,new JsonHttpResponseHandler(){
+        ApiClient.getLocations(new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 try {
@@ -65,7 +65,7 @@ public class SelectLocationDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        adapter = new LocationListAdapter(items, getContext());
+        adapter = new LocationListAdapter(items);
 
         View rootView = inflater.inflate(R.layout.select_location, null);
 

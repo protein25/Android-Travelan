@@ -21,7 +21,6 @@ import travelan.art.sangeun.travelan.dialog.SelectLocationDialog;
 
 public class WriteNewspeedActivity extends AppCompatActivity {
     private static final String TAG = "WriteNewspeedActivity";
-    private int memberId;//memberId유지하는 거 몰라서 이렇게 선언해놨음
     private Button location;
     private CarouselView photoSlide;
     private EditText writeContet;
@@ -47,7 +46,7 @@ public class WriteNewspeedActivity extends AppCompatActivity {
 
     //여행 선택 dialog method
     private void selectLocation(){
-        SelectLocationDialog dialog = SelectLocationDialog.newInstance(memberId);
+        SelectLocationDialog dialog = SelectLocationDialog.newInstance();
         dialog.show(getSupportFragmentManager(),"selectLocationDialog");
     }
 }

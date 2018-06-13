@@ -28,15 +28,20 @@ public class ApiClient {
         httpClient.post(HOST_URL + url, params, httpResponseHandler);
     }
 
+    static public void getUserInfo(AsyncHttpResponseHandler httpHandler){
+        ApiClient.post("/members/",null,httpHandler);
+    }
+
     static public void login(AsyncHttpResponseHandler httpHandler) {
         ApiClient.post("/members/login", null, httpHandler);
     }
 
-    static public void join(RequestParams params, AsyncHttpResponseHandler httpResponseHandler)
-
-
-    {
+    static public void join(RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
         ApiClient.post("/members/join", params, httpResponseHandler);
+    }
+
+    static public void getFavs(AsyncHttpResponseHandler handler){
+        ApiClient.post("/newspeed/favs",null,handler);
     }
 
     static public void getNewspeeds(int page, AsyncHttpResponseHandler httpResponseHandler) {
@@ -51,11 +56,8 @@ public class ApiClient {
         ApiClient.get("/informations", params, httpResponseHandler);
     }
 
-    static public void getLocations(int memberId, AsyncHttpResponseHandler httpResponseHandler){
-        RequestParams params = new RequestParams();
-        params.put("memberId",memberId);
-
-        ApiClient.post("/locations",params,httpResponseHandler);
+    static public void getLocations(AsyncHttpResponseHandler httpResponseHandler){
+        ApiClient.post("/locations",null,httpResponseHandler);
     }
 
     static public void getMonthTravel(int year, int month, AsyncHttpResponseHandler httpResponseHandler) {
