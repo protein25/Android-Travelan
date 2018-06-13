@@ -1,8 +1,10 @@
 package travelan.art.sangeun.travelan;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,6 +41,7 @@ public class NewspeedFragment extends Fragment {
     private RecyclerView newspeedList;
     private NewspeedListAdapter adapter;
     private List<Newspeed> items = new ArrayList<>();
+    private FloatingActionButton addBtn;
 
     @Nullable
     @Override
@@ -46,9 +49,19 @@ public class NewspeedFragment extends Fragment {
         setHasOptionsMenu(true);
 
         View rootView = inflater.inflate(R.layout.fragment_newspeed, container, false);
+
         newspeedList = rootView.findViewById(R.id.newspeedList);
         newspeedList.setLayoutManager(new LinearLayoutManager(getContext()));
         newspeedList.setItemAnimator(new DefaultItemAnimator());
+
+        addBtn = rootView.findViewById(R.id.addBtn);
+        addBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),WriteNewspeedActivity.class);
+                startActivity(intent);
+            }
+        });
 
         getList(0);
         return rootView;

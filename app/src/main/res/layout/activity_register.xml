@@ -12,8 +12,8 @@
         android:id="@+id/userThumb"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:padding="45dp"
         android:background="@drawable/gray_border"
+        android:padding="45dp"
         android:src="@mipmap/ic_launcher_round"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="생년월일"
+            android:hint="생년월일(19941015)"
             android:inputType="date" />
     </android.support.design.widget.TextInputLayout>
 
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="비상연락망"
-            android:inputType="phone"/>
+            android:inputType="phone" />
     </android.support.design.widget.TextInputLayout>
 
     <TextView
@@ -92,9 +92,9 @@
     <RadioGroup
         android:id="@+id/sexInput"
         android:layout_width="0dp"
-        android:background="@drawable/gray_border"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:background="@drawable/gray_border"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="4"
