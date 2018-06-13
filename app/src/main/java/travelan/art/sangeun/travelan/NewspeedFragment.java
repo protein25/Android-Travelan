@@ -90,7 +90,7 @@ public class NewspeedFragment extends Fragment {
 
                         items.add(item);
                     }
-                    adapter = new NewspeedListAdapter(getContext(), items);
+                    adapter = new NewspeedListAdapter(items);
                     newspeedList.setAdapter(adapter);
                 } catch (JSONException e) {
                     Log.e("FAIL TO PARSE DATA", e.getMessage());
