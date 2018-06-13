@@ -87,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 if (!thumbnailUrl.equals("")) {
-                    params.add("thumb", idInput.getText().toString());
+                    params.add("thumb", thumbnailUrl);
                 }
 
                 ApiClient.join(params, new AsyncHttpResponseHandler() {
