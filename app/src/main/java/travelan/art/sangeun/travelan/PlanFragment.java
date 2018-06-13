@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import travelan.art.sangeun.travelan.adapters.BottomSheetListener;
 import travelan.art.sangeun.travelan.adapters.PlanAdapter;
 import travelan.art.sangeun.travelan.models.Plan;
 import travelan.art.sangeun.travelan.utils.ApiClient;
@@ -50,6 +53,11 @@ public class PlanFragment extends Fragment {
     private Calendar calendar = Calendar.getInstance();
     private PlanAdapter adapter;
     private FloatingActionButton addBtn;
+    private ConstraintLayout selectAttributeType;
+    private LinearLayout attributeTransport;
+    private LinearLayout attributeAttraction;
+    private LinearLayout attributeAccommodate;
+    private FrameLayout selectBackground;
 
     @Nullable
     @Override
@@ -61,6 +69,11 @@ public class PlanFragment extends Fragment {
         planList = v.findViewById(R.id.planList);
         calendarView = v.findViewById(R.id.calendarView);
         addBtn = v.findViewById(R.id.addBtn);
+        selectAttributeType = v.findViewById(R.id.selectAttributeType);
+        attributeTransport = v.findViewById(R.id.transport);
+        attributeAccommodate = v.findViewById(R.id.accommodate);
+        attributeAttraction = v.findViewById(R.id.attraction);
+        selectBackground = v.findViewById(R.id.selectBackground);
 
         Date currentDate = calendarView.getFirstDayOfCurrentMonth();
         getMonthTravel(currentDate);
@@ -87,10 +100,17 @@ public class PlanFragment extends Fragment {
             }
         });
 
+        selectBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectAttributeType.setVisibility(View.GONE);
+            }
+        });
+
         planList.setLayoutManager(new LinearLayoutManager(getContext()));
         planList.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new PlanAdapter(getFragmentManager(), new ArrayList<Plan>());
+        adapter = new PlanAdapter(this, new ArrayList<Plan>());
         planList.setAdapter(adapter);
 
         return v;
@@ -241,5 +261,21 @@ public class PlanFragment extends Fragment {
 
         adapter.items = plans;
         adapter.notifyDataSetChanged();
+    }
+
+    public final void openAttributeSelect(final BottomSheetListener bottomSheetListener) {
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectAttributeType.setVisibility(View.GONE);
+                bottomSheetListener.onSelect(view.getId());
+            }
+        };
+
+        attributeTransport.setOnClickListener(clickListener);
+        attributeAccommodate.setOnClickListener(clickListener);
+        attributeAttraction.setOnClickListener(clickListener);
+
+        selectAttributeType.setVisibility(View.VISIBLE);
     }
 }

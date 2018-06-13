@@ -1,7 +1,6 @@
 package travelan.art.sangeun.travelan.adapters;
 
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +9,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import travelan.art.sangeun.travelan.PlanFragment;
 import travelan.art.sangeun.travelan.R;
-import travelan.art.sangeun.travelan.dialog.MapLocation;
+import travelan.art.sangeun.travelan.models.MapLocation;
 import travelan.art.sangeun.travelan.dialog.MapLocationDialog;
-import travelan.art.sangeun.travelan.dialog.OnMapSelectListener;
+import travelan.art.sangeun.travelan.utils.OnMapSelectListener;
 import travelan.art.sangeun.travelan.models.Plan;
 
 public class PlanAdapter extends RecyclerView.Adapter {
@@ -22,10 +22,10 @@ public class PlanAdapter extends RecyclerView.Adapter {
     private static final int ATTRIBUTE_TRANSPORT = 2;
 
     public List<Plan> items;
-    private FragmentManager fragmentManager;
+    private PlanFragment planFragment;
 
-    public PlanAdapter(FragmentManager fragmentManager, List<Plan> items) {
-        this.fragmentManager = fragmentManager;
+    public PlanAdapter(PlanFragment planFragment, List<Plan> items) {
+        this.planFragment = planFragment;
         this.items = items;
     }
 
@@ -57,14 +57,19 @@ public class PlanAdapter extends RecyclerView.Adapter {
             viewHolder.add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    MapLocationDialog mapLocationDialog = new MapLocationDialog();
-                    mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
+                    planFragment.openAttributeSelect(new BottomSheetListener() {
                         @Override
-                        public void onSelect(MapLocation mapLocation) {
+                        public void onSelect(int id) {
+                            MapLocationDialog mapLocationDialog = new MapLocationDialog();
+                            mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
+                                @Override
+                                public void onSelect(MapLocation mapLocation) {
 
+                                }
+                            });
+                            mapLocationDialog.show(planFragment.getFragmentManager(), "mapLocationDialog");
                         }
                     });
-                    mapLocationDialog.show(fragmentManager, "mapLocationDialog");
                 }
             });
         } else if (viewType == ATTRIBUTE_TRANSPORT) {

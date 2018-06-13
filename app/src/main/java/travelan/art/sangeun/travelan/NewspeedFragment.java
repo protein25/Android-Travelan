@@ -76,7 +76,9 @@ public class NewspeedFragment extends Fragment {
                         item.images = new ArrayList<>();
                         JSONArray images = object.getJSONArray("images");
                         for (int imageIndex = 0; imageIndex < images.length(); imageIndex++) {
-                            item.images.add(images.getString(imageIndex));
+                            JSONObject image = images.getJSONObject(imageIndex);
+                            String imageUrl = image.getString("serverName") + image.getString("originName");
+                            item.images.add(imageUrl);
                         }
 
                         if (!object.isNull("planId")) {
