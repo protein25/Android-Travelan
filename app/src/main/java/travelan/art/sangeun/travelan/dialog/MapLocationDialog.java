@@ -1,11 +1,8 @@
 package travelan.art.sangeun.travelan.dialog;
 
-import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +11,8 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import travelan.art.sangeun.travelan.R;
 
@@ -21,9 +20,14 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
     private static View rootView;
     private SupportMapFragment mapFragment;
     private GoogleMap gMap;
+    private OnMapSelectListener onMapSelectListener;
 
     public MapLocationDialog() {
 
+    }
+
+    public void setOnMapSelectedListener(OnMapSelectListener onMapSelectListener) {
+        this.onMapSelectListener = onMapSelectListener;
     }
 
     @Nullable
@@ -50,5 +54,20 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (onMapSelectListener != null) {
+                    MapLocation mapLocation = new MapLocation();
+                    mapLocation.latlng = marker.getPosition();
+                    mapLocation.address = marker.getTag().toString();
+                    mapLocation.poi = marker.getTitle();
+
+                    onMapSelectListener.onSelect(mapLocation);
+                }
+
+                return false;
+            }
+        });
     }
 }

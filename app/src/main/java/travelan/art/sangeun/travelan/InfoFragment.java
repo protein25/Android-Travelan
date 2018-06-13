@@ -45,10 +45,10 @@ public class InfoFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_info, container, false);
         setHasOptionsMenu(true);
 
-        makeDummy();
+        getList();
 
         recyclerView = v.findViewById(R.id.infoList);
-        adapter = new InformationListAdapter(items, getContext());
+        adapter = new InformationListAdapter(items);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
@@ -61,7 +61,7 @@ public class InfoFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    public void makeDummy() {
+    public void getList() {
         items = new ArrayList<>();
 
         ApiClient.getInformations(0, new JsonHttpResponseHandler() {
@@ -80,6 +80,8 @@ public class InfoFragment extends Fragment {
                         items.add(item);
                     }
 
+                    adapter.items = items;
+                    adapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     Log.e(TAG, "onSuccess: " + e.getMessage());
                     Toast.makeText(getContext(), "FAIL LOAD INFORMATION LIST", Toast.LENGTH_LONG).show();

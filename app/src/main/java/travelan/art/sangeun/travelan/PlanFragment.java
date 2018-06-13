@@ -2,15 +2,15 @@ package travelan.art.sangeun.travelan;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,13 +18,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -38,7 +36,6 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.adapters.PlanAdapter;
-import travelan.art.sangeun.travelan.dialog.MapLocationDialog;
 import travelan.art.sangeun.travelan.models.Plan;
 import travelan.art.sangeun.travelan.utils.ApiClient;
 
@@ -50,21 +47,20 @@ public class PlanFragment extends Fragment {
     private static final String TAG = "PlanFragment";
     private CompactCalendarView calendarView;
     private RecyclerView planList;
-    private MapLocationDialog mapLocationDialog;
     private Calendar calendar = Calendar.getInstance();
     private PlanAdapter adapter;
+    private FloatingActionButton addBtn;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
 
         View v = inflater.inflate(R.layout.fragment_plan, container, false);
 
         planList = v.findViewById(R.id.planList);
         calendarView = v.findViewById(R.id.calendarView);
-
-        mapLocationDialog = new MapLocationDialog();
+        addBtn = v.findViewById(R.id.addBtn);
 
         Date currentDate = calendarView.getFirstDayOfCurrentMonth();
         getMonthTravel(currentDate);
@@ -72,6 +68,7 @@ public class PlanFragment extends Fragment {
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
+                doneEditPlans();
                 getDatePlans(dateClicked);
             }
 
@@ -81,10 +78,19 @@ public class PlanFragment extends Fragment {
             }
         });
 
+        addBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addBtn.hide();
+                editPlans();
+                setHasOptionsMenu(true);
+            }
+        });
+
         planList.setLayoutManager(new LinearLayoutManager(getContext()));
         planList.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new PlanAdapter(new ArrayList<Plan>());
+        adapter = new PlanAdapter(getFragmentManager(), new ArrayList<Plan>());
         planList.setAdapter(adapter);
 
         return v;
@@ -100,7 +106,7 @@ public class PlanFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.addPlan:
-                mapLocationDialog.show(getFragmentManager(), "dialog");
+                doneEditPlans();
                 return true;
             default:
                 return false;
@@ -167,6 +173,8 @@ public class PlanFragment extends Fragment {
                         JSONObject object = response.getJSONObject(i);
                         String attributeType = object.getString("attributeType");
                         Plan plan = new Plan();
+                        plan.id = object.getInt("id");
+                        plan.order = object.getDouble("order");
                         plan.attributeType = attributeType;
 
                         if (attributeType.equals("transportation")) {
@@ -186,13 +194,10 @@ public class PlanFragment extends Fragment {
 
                     adapter.items = plans;
                     adapter.notifyDataSetChanged();
-                    planList.refreshDrawableState();
                 } catch (JSONException e) {
                     Log.i("FAIL TO PARSE", e.getMessage());
                     Toast.makeText(getContext(), "FAIL TO PARSE DATE PLANS", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
 
             @Override
@@ -200,5 +205,41 @@ public class PlanFragment extends Fragment {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
+    }
+
+    public void editPlans() {
+        List<Plan> editablePlans = new ArrayList<>();
+        List<Plan> plans = adapter.items;
+
+        double firstOrder = plans.size() > 0 ? plans.get(0).order - 2 : 0;
+
+        editablePlans.add(Plan.getAddInstance(firstOrder));
+
+        for(int i = 0; i < plans.size(); i++) {
+            Plan plan = plans.get(i);
+            editablePlans.add(plans.get(i));
+            double nextOrder = i + 1 < plans.size() ? (plan.order + plans.get(i + 1).order) / 2 : plan.order + 2;
+            editablePlans.add(Plan.getAddInstance(nextOrder));
+        }
+
+        adapter.items = editablePlans;
+        adapter.notifyDataSetChanged();
+    }
+
+    public void doneEditPlans() {
+        setHasOptionsMenu(false);
+        addBtn.show();
+
+        List<Plan> plans = new ArrayList<>();
+
+        for(Plan plan: adapter.items) {
+            Log.i("plan", plan.toString());
+            if (plan.id > 0) {
+                plans.add(plan);
+            }
+        }
+
+        adapter.items = plans;
+        adapter.notifyDataSetChanged();
     }
 }

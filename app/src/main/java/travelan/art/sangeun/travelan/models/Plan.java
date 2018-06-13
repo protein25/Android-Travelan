@@ -1,6 +1,8 @@
 package travelan.art.sangeun.travelan.models;
 
 public class Plan {
+    public int id;
+    public double order;
     public String title;
     public String address;
     public String tel;
@@ -13,6 +15,13 @@ public class Plan {
     public String attributeType;
 
     public String toString(){
-        return "title : "+title+"address : "+address ;
+        return "id:" + id + ", title : "+title+", address : "+address ;
+    }
+
+    public static final Plan getAddInstance(double order) {
+        Plan add = new Plan();
+        add.id = -1;
+        add.order = order;
+        return add;
     }
 }

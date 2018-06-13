@@ -9,7 +9,8 @@ import com.loopj.android.http.RequestParams;
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
 //    private static final String HOST_URL = "http://18.191.11.177:3000";
-    private static final String HOST_URL = "http://172.30.1.20:3000";
+//    private static final String HOST_URL = "http://172.30.1.10:3000";
+    private static final String HOST_URL = "http://192.168.1.29:3000";
     private static String token = "";
 
     static public void setToken(String token) {
@@ -17,7 +18,7 @@ public class ApiClient {
     }
 
     static public void get(String url, RequestParams params, AsyncHttpResponseHandler httpResponseHandler) {
-        httpClient.addHeader("accessToken", ApiClient.token);
+        httpClient.addHeader("access-token", ApiClient.token);
         httpClient.get(HOST_URL + url, params, httpResponseHandler);
     }
 
