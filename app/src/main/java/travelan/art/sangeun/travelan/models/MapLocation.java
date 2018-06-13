@@ -1,4 +1,4 @@
-package travelan.art.sangeun.travelan.dialog;
+package travelan.art.sangeun.travelan.models;
 
 
 import com.google.android.gms.maps.model.LatLng;
