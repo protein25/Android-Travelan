@@ -11,13 +11,19 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class BleScanner {
     private static BluetoothManager btManager;
     private static BluetoothAdapter btAdapter;
     private static BluetoothLeScanner btScanner;
-    private static boolean isScanning = false;
+    public static boolean isScanning = false;
+    public static final Map<String, Long> connectedDevices = new HashMap<>();
+    public static final Set<String> myDevices = new HashSet<>();
 
     public static final void init(Context context) {
         btManager = (BluetoothManager)context.getSystemService(Context.BLUETOOTH_SERVICE);

@@ -41,7 +41,7 @@ public class ApiClient {
     }
 
     static public void getUserInfo(AsyncHttpResponseHandler httpHandler){
-        ApiClient.post("/members/",null,httpHandler);
+        ApiClient.get("/members/",null,httpHandler);
     }
 
     static public void login(AsyncHttpResponseHandler httpHandler) {
@@ -53,7 +53,9 @@ public class ApiClient {
     }
 
     static public void getFavs(AsyncHttpResponseHandler handler){
-        ApiClient.post("/newspeed/favs",null,handler);
+        RequestParams params = new RequestParams();
+        params.put("mypage", true);
+        ApiClient.get("/newspeed",params,handler);
     }
 
     static public void getNewspeeds(int page, AsyncHttpResponseHandler httpResponseHandler) {
@@ -106,6 +108,11 @@ public class ApiClient {
         params.put("route", plan.route);
         params.put("order", plan.order);
 
+        if (plan.coordinates != null) {
+            params.put("lat", plan.coordinates.latitude);
+            params.put("lng", plan.coordinates.longitude);
+        }
+
         ApiClient.post("/plan/write", params, httpResponseHandler);
     }
 
@@ -150,6 +157,22 @@ public class ApiClient {
         params.put("newspeedId", newspeedId);
         params.put("content", content);
         ApiClient.post("/comment/", params, httpResponseHandler);
+    }
+
+    static public void getMyDevices(AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.get("/device", null, httpResponseHandler);
+    }
+
+    static public void addDevice(String mac, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("mac", mac);
+        ApiClient.post("/device/add", params, httpResponseHandler);
+    }
+
+    static public void addDeviceImage(int id, Uri imageUri, AsyncHttpResponseHandler httpResponseHandler) throws FileNotFoundException, URISyntaxException {
+        RequestParams params = new RequestParams();
+        params.put("image", new File(new URI(imageUri.toString())));
+        ApiClient.post("/device/" + id + "/addImage", params, httpResponseHandler);
     }
 
     static public void reportDevice(String mac, double lat, double lng, AsyncHttpResponseHandler httpResponseHandler) {

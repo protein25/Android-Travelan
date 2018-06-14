@@ -3,9 +3,13 @@ package travelan.art.sangeun.travelan;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -24,23 +28,27 @@ import travelan.art.sangeun.travelan.utils.ApiClient;
 
 public class MyPageActivity extends AppCompatActivity {
     private Toolbar toolbar;
+    private TextView title;
     private RecyclerView recyclerView;
     private NewspeedListAdapter adapter;
-    private List<Newspeed> items;
+    private List<Newspeed> items = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_page);
         toolbar = findViewById(R.id.toolbar);
-        recyclerView = findViewById(R.id.favsList);
-        items = new ArrayList<>();
+        title = toolbar.findViewById(R.id.title);
+        setSupportActionBar(toolbar);
+        title.setText(R.string.MyPage);
 
-        this.setSupportActionBar(toolbar);
-        toolbar.setTitle(R.string.MyPage);
+        recyclerView = findViewById(R.id.favsList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
 
         ApiClient.getFavs(new JsonHttpResponseHandler(){
             @Override
@@ -50,14 +58,16 @@ public class MyPageActivity extends AppCompatActivity {
                         JSONObject object = resultArray.getJSONObject(i);
 
                         Newspeed item = new Newspeed();
-                        item.location = "#FUKUOKA";
-                        item.isFav = false;
+                        item.location = "#" + object.getJSONObject("travel").getString("title");
+                        item.isFav = object.getBoolean("isFav");
                         item.contents = object.getString("content");
 
                         item.images = new ArrayList<>();
                         JSONArray images = object.getJSONArray("images");
                         for (int imageIndex = 0; imageIndex < images.length(); imageIndex++) {
-                            item.images.add(images.getString(imageIndex));
+                            JSONObject image = images.getJSONObject(imageIndex);
+                            String imageUrl = image.getString("serverName") + image.getString("originName");
+                            item.images.add(imageUrl);
                         }
 
                         if (!object.isNull("planId")) {
@@ -79,5 +89,15 @@ public class MyPageActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

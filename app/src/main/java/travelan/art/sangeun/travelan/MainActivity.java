@@ -19,8 +19,20 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.services.BleScanService;
+import travelan.art.sangeun.travelan.utils.ApiClient;
 import travelan.art.sangeun.travelan.utils.BleScanner;
 
 
@@ -63,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         readyFragement(FRAG_NEWSPEED);
         setToolbar(R.id.nav_newspeed);
+        getMyDevices();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -202,5 +215,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    private void getMyDevices() {
+        BleScanner.myDevices.clear();
+        ApiClient.getMyDevices(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject object = response.getJSONObject(i);
+                        String mac = object.getString("mac");
+                        BleScanner.myDevices.add(mac);
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(MainActivity.this, "FAIL TO PARSE DEVICES", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(MainActivity.this, "FAIL TO LOAD DEVICES", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

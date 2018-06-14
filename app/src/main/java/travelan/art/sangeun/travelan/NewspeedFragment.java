@@ -6,13 +6,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -74,6 +78,50 @@ public class NewspeedFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_newspeed, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mypage:
+                Intent intent = new Intent(getContext(), MyPageActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.report:
+                alertSMS();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void alertSMS() {
+        ApiClient.getUserInfo(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    String name = response.getString("name");
+                    String emergencyPhone = response.getString("emergency");
+
+                    String msg = name + "(이) 가 위험합니다.";
+
+                    try {
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(emergencyPhone, null, msg, null, null);
+                        Toast.makeText(getContext(), "Message Sent",
+                                Toast.LENGTH_LONG).show();
+                    } catch (Exception ex) {
+                        Toast.makeText(getContext(),ex.getMessage().toString(),
+                                Toast.LENGTH_LONG).show();
+                        ex.printStackTrace();
+                    }
+                }catch(JSONException e){
+                    Log.e("FAIL TO PARSE DATA", e.getMessage());
+                }
+            }
+        });
     }
 
     private void getList(int page) {

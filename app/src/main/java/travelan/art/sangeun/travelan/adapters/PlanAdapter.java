@@ -21,6 +21,7 @@ import travelan.art.sangeun.travelan.R;
 import travelan.art.sangeun.travelan.dialog.SelectTravelDialog;
 import travelan.art.sangeun.travelan.models.MapLocation;
 import travelan.art.sangeun.travelan.dialog.MapLocationDialog;
+import travelan.art.sangeun.travelan.utils.Alert;
 import travelan.art.sangeun.travelan.utils.ApiClient;
 import travelan.art.sangeun.travelan.utils.OnMapSelectListener;
 import travelan.art.sangeun.travelan.models.Plan;
@@ -84,6 +85,19 @@ public class PlanAdapter extends RecyclerView.Adapter {
             ViewHolderCommon viewHolder = (ViewHolderCommon) holder;
             viewHolder.title.setText(item.title);
             viewHolder.address.setText(item.address);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (item.coordinates == null) {
+                        Alert.show(planFragment.getContext(), "위치정보가 없습니다.");
+                        return;
+                    }
+
+                    MapLocationDialog mapDialog = new MapLocationDialog();
+                    mapDialog.setPoint(item.coordinates);
+                    mapDialog.show(planFragment.getFragmentManager(), "mapDialog");
+                }
+            });
         }
     }
 
@@ -132,6 +146,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                         item.setAttributeTypeById(id);
                         item.title = mapLocation.poi;
                         item.address = mapLocation.address;
+                        item.coordinates = mapLocation.latlng;
 
                         ApiClient.addPlan(item, planFragment.selectedDate, new JsonHttpResponseHandler() {
                             @Override
