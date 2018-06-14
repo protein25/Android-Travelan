@@ -133,11 +133,29 @@ public class ApiClient {
     static public void toggleFav(boolean isAdd, int newspeedId, AsyncHttpResponseHandler httpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("newspeedId", newspeedId);
-Log.i("isAdd", "" + isAdd);
+
         if (isAdd) {
             ApiClient.post("/newspeed/addFav", params, httpResponseHandler);
         } else {
             ApiClient.post("/newspeed/delFav", params, httpResponseHandler);
         }
+    }
+
+    static public void getComments(int newspeedId, AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.get("/comment/" + newspeedId, null, httpResponseHandler);
+    }
+
+    static public void writeComment(int newspeedId, String content, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("newspeedId", newspeedId);
+        params.put("content", content);
+        ApiClient.post("/comment/", params, httpResponseHandler);
+    }
+
+    static public void reportDevice(String mac, double lat, double lng, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("lat", lat);
+        params.put("lng", lng);
+        ApiClient.post("/device/report/" + mac, params, httpResponseHandler);
     }
 }

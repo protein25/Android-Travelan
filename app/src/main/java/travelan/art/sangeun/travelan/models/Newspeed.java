@@ -1,5 +1,7 @@
 package travelan.art.sangeun.travelan.models;
 
+import android.os.Bundle;
+
 import java.util.List;
 
 public class Newspeed {

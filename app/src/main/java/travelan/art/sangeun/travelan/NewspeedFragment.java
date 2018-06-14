@@ -54,7 +54,7 @@ public class NewspeedFragment extends Fragment {
         newspeedList.setLayoutManager(new LinearLayoutManager(getContext()));
         newspeedList.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new NewspeedListAdapter(items);
+        adapter = new NewspeedListAdapter(getContext(), items);
         newspeedList.setAdapter(adapter);
 
         addBtn = rootView.findViewById(R.id.addBtn);

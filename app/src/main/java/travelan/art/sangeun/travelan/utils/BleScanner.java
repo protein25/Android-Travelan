@@ -60,8 +60,8 @@ public class BleScanner {
                         }
 
                         if (isScanned) {
-                            scannedDevices.add(result.getDevice());
-                            scanListener.onScan(result.getDevice());
+                            scannedDevices.add(scannedDevice);
+                            scanListener.onScan(scannedDevice);
                         }
                     }
 
