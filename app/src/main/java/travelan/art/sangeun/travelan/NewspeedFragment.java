@@ -54,12 +54,15 @@ public class NewspeedFragment extends Fragment {
         newspeedList.setLayoutManager(new LinearLayoutManager(getContext()));
         newspeedList.setItemAnimator(new DefaultItemAnimator());
 
+        adapter = new NewspeedListAdapter(items);
+        newspeedList.setAdapter(adapter);
+
         addBtn = rootView.findViewById(R.id.addBtn);
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(),WriteNewspeedActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -82,8 +85,9 @@ public class NewspeedFragment extends Fragment {
                         JSONObject object = resultArray.getJSONObject(i);
 
                         Newspeed item = new Newspeed();
-                        item.location = "#FUKUOKA";
-                        item.isFav = false;
+                        item.id = object.getInt("id");
+                        item.location = "#" + object.getJSONObject("travel").getString("title");
+                        item.isFav = object.getBoolean("isFav");
                         item.contents = object.getString("content");
 
                         item.images = new ArrayList<>();
@@ -103,10 +107,9 @@ public class NewspeedFragment extends Fragment {
                         item.user.thumbnail = member.getString("thumb");
                         item.user.userId = member.getString("userId");
 
-                        items.add(item);
+                        adapter.items.add(item);
                     }
-                    adapter = new NewspeedListAdapter(items);
-                    newspeedList.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     Log.e("FAIL TO PARSE DATA", e.getMessage());
                     Toast.makeText(getContext(), "FAIL TO PARSE DATA", Toast.LENGTH_SHORT).show();
@@ -119,5 +122,18 @@ public class NewspeedFragment extends Fragment {
                 Toast.makeText(getContext(), "FAIL TO LOAD DATA", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 0:
+                adapter.items.clear();
+                getList(0);
+                newspeedList.scrollToPosition(0);
+                break;
+            default:
+                break;
+        }
     }
 }

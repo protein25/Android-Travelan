@@ -11,17 +11,22 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.R;
 import travelan.art.sangeun.travelan.models.Newspeed;
+import travelan.art.sangeun.travelan.utils.ApiClient;
 
 public class NewspeedListAdapter extends RecyclerView.Adapter{
-    private List<Newspeed> items;
+    public List<Newspeed> items;
 
     public NewspeedListAdapter (List<Newspeed> items) {
         this.items = items;
@@ -35,7 +40,7 @@ public class NewspeedListAdapter extends RecyclerView.Adapter{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         final ViewHolder mViewHolder = (ViewHolder)holder;
         final Newspeed item = items.get(position);
         Log.i("onBindViewHolder", item.toString());
@@ -47,6 +52,30 @@ public class NewspeedListAdapter extends RecyclerView.Adapter{
         } else {
             mViewHolder.btnAddFavs.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
+        mViewHolder.btnAddFavs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApiClient.toggleFav(!item.isFav, item.id, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+                });
+
+                if (item.isFav) {
+                    mViewHolder.btnAddFavs.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                } else {
+                    mViewHolder.btnAddFavs.setImageResource(R.drawable.ic_favorite_black_24dp);
+                }
+
+                items.get(position).isFav = !item.isFav;
+            }
+        });
         mViewHolder.imageCarousel.setPageCount(item.images.size());
         mViewHolder.imageCarousel.setImageListener(new ImageListener() {
             @Override

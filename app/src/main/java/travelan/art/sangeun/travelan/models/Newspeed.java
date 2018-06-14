@@ -3,6 +3,7 @@ package travelan.art.sangeun.travelan.models;
 import java.util.List;
 
 public class Newspeed {
+    public int id;
     public String location;
     public boolean isFav;
     public List<String> images;

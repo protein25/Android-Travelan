@@ -1,20 +1,27 @@
 package travelan.art.sangeun.travelan.utils;
 
+import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import travelan.art.sangeun.travelan.models.Plan;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
 //    private static final String HOST_URL = "http://18.191.11.177:3000";
-    private static final String HOST_URL = "http://172.30.1.40:3000";
+    private static final String HOST_URL = "http://172.30.1.14:3000";
 //    private static final String HOST_URL = "http://192.168.1.29:3000";
     private static String token = "";
 
@@ -65,6 +72,10 @@ public class ApiClient {
         ApiClient.post("/locations",null,httpResponseHandler);
     }
 
+    static public void getTravels(AsyncHttpResponseHandler httpResponseHandler) {
+        ApiClient.get("/travel", null, httpResponseHandler);
+    }
+
     static public void getMonthTravel(int year, int month, AsyncHttpResponseHandler httpResponseHandler) {
         ApiClient.get("/travel/" + year + "/" + month , null, httpResponseHandler);
     }
@@ -102,5 +113,31 @@ public class ApiClient {
         RequestParams params = new RequestParams();
         params.put("keyword", keyword);
         ApiClient.get("/plan/findLocation", params, httpResponseHandler);
+    }
+
+    static public void writeNewspeed(int travelId, String content, List<Uri> imageUriList, AsyncHttpResponseHandler httpResponseHandler) throws FileNotFoundException, URISyntaxException {
+        RequestParams params = new RequestParams();
+        params.put("travelId", travelId);
+        params.put("content", content);
+
+        File files[] = new File[imageUriList.size()];
+        for(int i = 0; i < imageUriList.size(); i++) {
+            File file = new File(new URI(imageUriList.get(i).toString()));
+            files[i] = file;
+        }
+        params.put("images", files);
+
+        ApiClient.post("/newspeed", params, httpResponseHandler);
+    }
+
+    static public void toggleFav(boolean isAdd, int newspeedId, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("newspeedId", newspeedId);
+Log.i("isAdd", "" + isAdd);
+        if (isAdd) {
+            ApiClient.post("/newspeed/addFav", params, httpResponseHandler);
+        } else {
+            ApiClient.post("/newspeed/delFav", params, httpResponseHandler);
+        }
     }
 }

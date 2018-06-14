@@ -78,8 +78,7 @@ public class PlanFragment extends Fragment {
         attributeAttraction = v.findViewById(R.id.attraction);
         selectBackground = v.findViewById(R.id.selectBackground);
 
-        Date currentDate = calendarView.getFirstDayOfCurrentMonth();
-        getMonthTravel(currentDate);
+        getMonthTravel(selectedDate);
 
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
@@ -187,7 +186,9 @@ public class PlanFragment extends Fragment {
         Map<String, String> data = (HashMap) events.get(0).getData();
         final int travelId = Integer.parseInt(data.get("id"));
         String travelTitle = data.get("title");
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(travelTitle);
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).title.setText("#" + travelTitle);
+        }
 
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);

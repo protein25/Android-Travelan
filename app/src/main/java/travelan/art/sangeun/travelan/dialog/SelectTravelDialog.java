@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -20,7 +21,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.R;
@@ -31,18 +34,24 @@ public class SelectTravelDialog extends DialogFragment {
     private RecyclerView nearByTravel;
     private EditText newTravel;
     private Button addTravel;
+    private TextView noData;
     private SelectTravelAdapter.OnTravelSelectListener onTravelSelectListener;
 
-    private List<Object> nearBy;
+    private List<Object> travels;
     private SelectTravelAdapter adapter;
+    private boolean isAddAble = true;
 
     public SelectTravelDialog() {
     }
 
-    public void init(List<Object> nearBy, SelectTravelAdapter.OnTravelSelectListener onTravelSelectListener) {
-        this.nearBy = nearBy;
+    public void init(List<Object> travels, SelectTravelAdapter.OnTravelSelectListener onTravelSelectListener) {
+        this.travels = travels;
         this.onTravelSelectListener = onTravelSelectListener;
-        adapter = new SelectTravelAdapter(this.nearBy, this.onTravelSelectListener);
+        adapter = new SelectTravelAdapter(this.travels, this.onTravelSelectListener);
+    }
+
+    public void setAddAble(boolean isAddAble) {
+        this.isAddAble = isAddAble;
     }
 
     @Nullable
@@ -53,6 +62,16 @@ public class SelectTravelDialog extends DialogFragment {
         nearByTravel = view.findViewById(R.id.nearByTravel);
         newTravel = view.findViewById(R.id.newTravel);
         addTravel = view.findViewById(R.id.addTravel);
+        noData = view.findViewById(R.id.noData);
+
+        if (!isAddAble) {
+            newTravel.setVisibility(View.GONE);
+            addTravel.setVisibility(View.GONE);
+        }
+
+        if (!isAddAble && travels.size() == 0) {
+            noData.setVisibility(View.VISIBLE);
+        }
 
         nearByTravel.setLayoutManager(new LinearLayoutManager(getContext()));
         nearByTravel.setItemAnimator(new DefaultItemAnimator());
@@ -65,8 +84,10 @@ public class SelectTravelDialog extends DialogFragment {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
-                            int travelId = response.getInt("id");
-                            onTravelSelectListener.onSelect(travelId);
+                            Map<String, String> travel = new HashMap<>();
+                            travel.put("id", response.getString("id"));
+                            travel.put("title", response.getString("title"));
+                            onTravelSelectListener.onSelect(travel);
                         } catch (JSONException e) {
                             Log.i("TRAVEL PARSE ERROR", e.getMessage());
                             Toast.makeText(getContext(), "FAIL TO PARSE TRAVEL", Toast.LENGTH_SHORT).show();

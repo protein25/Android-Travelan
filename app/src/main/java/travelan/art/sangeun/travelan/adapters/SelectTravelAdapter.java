@@ -31,14 +31,21 @@ public class SelectTravelAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewHolder viewHolder = (ViewHolder) holder;
-        Map<String, String> travel = (HashMap) items.get(position);
+        final Map<String, String> travel = (HashMap) items.get(position);
 
-        final int travelId = Integer.parseInt(travel.get("id"));
         viewHolder.travelTitle.setText("#" + travel.get("title"));
+
+        if (travel.get("dateString") != null) {
+            viewHolder.dateString.setVisibility(View.VISIBLE);
+            viewHolder.dateString.setText(travel.get("dateString"));
+        } else {
+            viewHolder.dateString.setVisibility(View.GONE);
+        }
+
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onTravelSelectListener.onSelect(travelId);
+                onTravelSelectListener.onSelect(travel);
             }
         });
     }
@@ -49,15 +56,16 @@ public class SelectTravelAdapter extends RecyclerView.Adapter {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView travelTitle;
+        public TextView travelTitle, dateString;
 
         public ViewHolder(View itemView) {
             super(itemView);
             travelTitle = itemView.findViewById(R.id.travelTitle);
+            dateString = itemView.findViewById(R.id.dateString);
         }
     }
 
     public interface OnTravelSelectListener {
-        void onSelect(int travelId);
+        void onSelect(Map<String, String> selected);
     }
 }

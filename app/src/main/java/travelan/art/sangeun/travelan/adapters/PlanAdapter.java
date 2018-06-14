@@ -111,9 +111,9 @@ public class PlanAdapter extends RecyclerView.Adapter {
         final SelectTravelDialog selectTravelDialog = new SelectTravelDialog();
         selectTravelDialog.init(planFragment.getNearByTravel(), new SelectTravelAdapter.OnTravelSelectListener() {
             @Override
-            public void onSelect(int travelId) {
+            public void onSelect(Map<String, String> travel) {
                 selectTravelDialog.dismiss();
-                item.travelId = travelId;
+                item.travelId = Integer.parseInt(travel.get("id"));
                 addPlan(item);
             }
         });

@@ -27,7 +27,7 @@ import travelan.art.sangeun.travelan.utils.BleScanner;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Toolbar toolbar;
-    private TextView title;
+    public TextView title;
     private FragmentManager fragmentManager;
 
     private BottomNavigationView navigator;
