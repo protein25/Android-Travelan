@@ -20,8 +20,8 @@ import travelan.art.sangeun.travelan.models.Plan;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
-//    private static final String HOST_URL = "http://18.191.11.177:3000";
-    private static final String HOST_URL = "http://172.30.1.14:3000";
+    private static final String HOST_URL = "http://18.191.11.177:3000";
+//    private static final String HOST_URL = "http://172.30.1.14:3000";
 //    private static final String HOST_URL = "http://192.168.1.29:3000";
     private static String token = "";
 
