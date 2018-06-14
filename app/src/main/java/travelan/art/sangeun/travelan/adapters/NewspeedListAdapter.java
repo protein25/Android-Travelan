@@ -1,5 +1,7 @@
 package travelan.art.sangeun.travelan.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,17 +20,21 @@ import com.synnapps.carouselview.ImageListener;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import travelan.art.sangeun.travelan.CommentActivity;
 import travelan.art.sangeun.travelan.R;
 import travelan.art.sangeun.travelan.models.Newspeed;
 import travelan.art.sangeun.travelan.utils.ApiClient;
 
 public class NewspeedListAdapter extends RecyclerView.Adapter{
     public List<Newspeed> items;
+    private Context context;
 
-    public NewspeedListAdapter (List<Newspeed> items) {
+    public NewspeedListAdapter (Context context, List<Newspeed> items) {
+        this.context = context;
         this.items = items;
     }
 
@@ -86,6 +92,22 @@ public class NewspeedListAdapter extends RecyclerView.Adapter{
             }
         });
         Picasso.get().load(item.user.thumbnail).into(mViewHolder.userThumb);
+
+        mViewHolder.commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, CommentActivity.class);
+                intent.putExtra("id", item.id);
+                intent.putExtra("location", item.location);
+                intent.putStringArrayListExtra("images", (ArrayList<String>)item.images);
+                intent.putExtra("isFav", item.isFav);
+                intent.putExtra("thumbnail", item.user.thumbnail);
+                intent.putExtra("userId", item.user.userId);
+                intent.putExtra("comment", item.contents);
+
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

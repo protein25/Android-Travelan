@@ -71,7 +71,7 @@ public class MyPageActivity extends AppCompatActivity {
 
                         items.add(item);
                     }
-                    adapter = new NewspeedListAdapter(items);
+                    adapter = new NewspeedListAdapter(MyPageActivity.this, items);
                     recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
                     Log.e("FAIL TO PARSE DATA", e.getMessage());
