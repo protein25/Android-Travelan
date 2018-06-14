@@ -1,5 +1,6 @@
 package travelan.art.sangeun.travelan.services;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,21 +8,34 @@ import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.R;
+import travelan.art.sangeun.travelan.utils.ApiClient;
 import travelan.art.sangeun.travelan.utils.BleScanListener;
 import travelan.art.sangeun.travelan.utils.BleScanner;
 
 public class BleScanService extends Service {
     private final int NOTIFICATION_ID = 0;
-    private final int BLE_SCAN_PERIOD = 3 * 60 * 1000; // try scan every 3 minutes;
-    private final int BLE_SCAN_DURATION = 60 * 1000; // scan for 1 minute;
+    private final int BLE_SCAN_PERIOD = 60 * 1000; // try scan every 3 minutes;
+    private final int BLE_SCAN_DURATION = 30 * 1000; // scan for 1 minute;
 
     private Handler handler = new Handler();
     private Timer periodicTimer = new Timer();
@@ -29,10 +43,13 @@ public class BleScanService extends Service {
 
     private Notification fixedNotification;
     private NotificationManager notificationManager;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         startTask = new TimerTask() {
             @Override
@@ -60,7 +77,7 @@ public class BleScanService extends Service {
             }
         };
 
-        notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -93,7 +110,37 @@ public class BleScanService extends Service {
         notificationManager.cancel(NOTIFICATION_ID);
     }
 
-    public void reportDeviceLocation(BluetoothDevice device) {
+    public void reportDeviceLocation(final BluetoothDevice device) {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location == null) {
+                    Log.i("LOCATION NULL", location.toString());
+                    return;
+                }
+
+                double lat = location.getLatitude();
+                double lng = location.getLongitude();
+                Log.i("LOCATION", location.toString() + " " + lat + " " + lng);
+
+                ApiClient.reportDevice(device.getAddress(), lat, lng, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+                });
+            }
+        });
+
         Log.i("BLE SCANNED", device.getAddress());
     }
 }

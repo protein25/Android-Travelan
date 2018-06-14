@@ -151,4 +151,11 @@ public class ApiClient {
         params.put("content", content);
         ApiClient.post("/comment/", params, httpResponseHandler);
     }
+
+    static public void reportDevice(String mac, double lat, double lng, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("lat", lat);
+        params.put("lng", lng);
+        ApiClient.post("/device/report/" + mac, params, httpResponseHandler);
+    }
 }
