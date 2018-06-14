@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<item
-    android:title="MyPage"
-    app:showAsAction="always"/>
+    <item android:id="@+id/report"
+        android:title="done"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_report_white_24dp"/>
+    <item
+        android:id="@+id/mypage"
+        android:title="MyPage"
+        app:showAsAction="always"/>
 </menu>

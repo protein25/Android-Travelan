@@ -23,6 +23,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,12 +35,13 @@ import travelan.art.sangeun.travelan.utils.BleScanner;
 
 public class BleScanService extends Service {
     private final int NOTIFICATION_ID = 0;
-    private final int BLE_SCAN_PERIOD = 60 * 1000; // try scan every 3 minutes;
-    private final int BLE_SCAN_DURATION = 30 * 1000; // scan for 1 minute;
+    private final int BLE_SCAN_PERIOD = 60 * 1000; // try scan every 1 minutes;
+    private final int BLE_SCAN_DURATION = 30 * 1000; // scan for 30 seconds;
 
     private Handler handler = new Handler();
     private Timer periodicTimer = new Timer();
-    private TimerTask startTask;
+    private Timer disconnectChecker = new Timer();
+    private TimerTask startTask, checker;
 
     private Notification fixedNotification;
     private NotificationManager notificationManager;
@@ -51,18 +53,33 @@ public class BleScanService extends Service {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        checker = new TimerTask() {
+            @Override
+            public void run() {
+                long currentTime = System.currentTimeMillis();
+
+                for(String key: BleScanner.connectedDevices.keySet()) {
+                    if (currentTime - BleScanner.connectedDevices.get(key) > BLE_SCAN_PERIOD) {
+                        BleScanner.connectedDevices.remove(key);
+                    }
+                }
+            }
+        };
+
         startTask = new TimerTask() {
             @Override
             public void run() {
                 BleScanner.startScan(new BleScanListener() {
                     @Override
                     public void onScan(BluetoothDevice device) {
+                        String mac = device.getAddress();
+                        BleScanner.connectedDevices.put(mac, System.currentTimeMillis());
                         reportDeviceLocation(device);
                     }
 
                     @Override
                     public void onError(int errorCode) {
-
+                        notificationManager.cancel(NOTIFICATION_ID);
                     }
                 });
 
@@ -88,6 +105,7 @@ public class BleScanService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         periodicTimer.schedule(startTask, 0, BLE_SCAN_PERIOD);
+        disconnectChecker.schedule(checker, BLE_SCAN_DURATION, BLE_SCAN_PERIOD);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

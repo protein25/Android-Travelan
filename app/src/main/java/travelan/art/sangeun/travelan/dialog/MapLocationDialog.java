@@ -51,8 +51,14 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
     private MapLocationListAdapter adapter;
     private InputMethodManager imm;
 
+    private LatLng latlng;
+
     public MapLocationDialog() {
 
+    }
+
+    public void setPoint(LatLng latlng) {
+        this.latlng = latlng;
     }
 
     public void setOnMapSelectedListener(OnMapSelectListener onMapSelectListener) {
@@ -65,8 +71,7 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
         imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (rootView != null) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
-            if (parent != null)
-                parent.removeView(rootView);
+            if (parent != null) parent.removeView(rootView);
         }
         try {
             rootView = inflater.inflate(R.layout.dialog_map_location, container, false);
@@ -111,6 +116,27 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (gMap != null && latlng != null) {
+            gMap.clear();
+            gMap.addMarker(new MarkerOptions().position(latlng));
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+            gMap.animateCamera(CameraUpdateFactory.zoomTo(15f));
+        }
+
+        if (latlng != null) {
+            keywordEdit.setVisibility(View.GONE);
+            searchBtn.setVisibility(View.GONE);
+            resultList.setVisibility(View.GONE);
+        } else {
+            keywordEdit.setVisibility(View.VISIBLE);
+            searchBtn.setVisibility(View.VISIBLE);
+            resultList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -126,6 +152,12 @@ public class MapLocationDialog extends DialogFragment implements OnMapReadyCallb
                 return false;
             }
         });
+
+        if (latlng != null) {
+            gMap.addMarker(new MarkerOptions().position(latlng));
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+            gMap.animateCamera(CameraUpdateFactory.zoomTo(15f));
+        }
     }
 
     private void findLocation(String keyword) {

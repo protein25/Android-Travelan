@@ -2,7 +2,23 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:src="@drawable/ic_add_black_24dp"
+        android:id="@+id/deviceImage"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:id="@+id/deviceDisabled"
+        android:background="#55000000"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/deviceImage"
+        app:layout_constraintBottom_toBottomOf="@id/deviceImage"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/deviceId"
@@ -11,6 +27,7 @@
         android:layout_margin="10dp"
         android:hint="기기이름"
         android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/deviceImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/switchDevice"/>
 
@@ -20,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/deviceImage"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

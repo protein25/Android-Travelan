@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -217,6 +218,12 @@ public class PlanFragment extends Fragment {
                             plan.way = object.getString("way");
                             plan.route = object.getString("route");
                         } else {
+                            if (!object.isNull("coordinates")) {
+                                JSONObject point = object.getJSONObject("coordinates");
+                                JSONArray coordinates = point.getJSONArray("coordinates");
+                                plan.coordinates = new LatLng(coordinates.getDouble(1), coordinates.getDouble(0));
+                            }
+
                             plan.title = object.getString("title");
                             plan.address = object.getString("address");
                         }
