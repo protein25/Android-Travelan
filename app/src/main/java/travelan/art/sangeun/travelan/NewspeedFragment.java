@@ -35,23 +35,24 @@ import travelan.art.sangeun.travelan.adapters.NewspeedListAdapter;
 import travelan.art.sangeun.travelan.models.Newspeed;
 import travelan.art.sangeun.travelan.models.User;
 import travelan.art.sangeun.travelan.utils.ApiClient;
+import travelan.art.sangeun.travelan.utils.BaseFragment;
 
 /**
  * Created by sangeun on 2018-05-12.
  */
 
-public class NewspeedFragment extends Fragment {
+public class NewspeedFragment extends BaseFragment {
     private static final String TAG = "NewspeedFragment";
     private RecyclerView newspeedList;
     private NewspeedListAdapter adapter;
     private List<Newspeed> items = new ArrayList<>();
     private FloatingActionButton addBtn;
+    private int currentPage = 0;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-
         View rootView = inflater.inflate(R.layout.fragment_newspeed, container, false);
 
         newspeedList = rootView.findViewById(R.id.newspeedList);
@@ -70,8 +71,13 @@ public class NewspeedFragment extends Fragment {
             }
         });
 
-        getList(0);
+        getList(currentPage);
         return rootView;
+    }
+
+    @Override
+    public void onFocus() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -125,6 +131,10 @@ public class NewspeedFragment extends Fragment {
     }
 
     private void getList(int page) {
+        if (adapter.items.size() > 0 && page == currentPage) {
+            return;
+        }
+
         ApiClient.getNewspeeds(page, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray resultArray) {

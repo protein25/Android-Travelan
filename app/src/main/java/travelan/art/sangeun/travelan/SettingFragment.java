@@ -32,13 +32,14 @@ import travelan.art.sangeun.travelan.adapters.MyDeviceListAdapter;
 import travelan.art.sangeun.travelan.dialog.SelectDeviceDialog;
 import travelan.art.sangeun.travelan.models.Device;
 import travelan.art.sangeun.travelan.utils.ApiClient;
+import travelan.art.sangeun.travelan.utils.BaseFragment;
 import travelan.art.sangeun.travelan.utils.BleScanner;
 
 /**
  * Created by sangeun on 2018-05-12.
  */
 
-public class SettingFragment extends Fragment {
+public class SettingFragment extends BaseFragment {
     private static final String TAG = "SettingFragment";
     private RecyclerView recyclerView;
     private MyDeviceListAdapter adapter;
@@ -99,6 +100,11 @@ public class SettingFragment extends Fragment {
         getMyDevices();
 
         return v;
+    }
+
+    @Override
+    public void onFocus() {
+        setHasOptionsMenu(false);
     }
 
     private void getMyDevices() {

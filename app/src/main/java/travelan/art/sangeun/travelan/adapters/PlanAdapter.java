@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
@@ -76,11 +77,17 @@ public class PlanAdapter extends RecyclerView.Adapter {
             });
         } else if (viewType == ATTRIBUTE_TRANSPORT) {
             ViewHolderTransport viewHolder = (ViewHolderTransport) holder;
-            viewHolder.time.setText(item.time);
-            viewHolder.way.setText(item.way);
             viewHolder.origin.setText(item.origin);
             viewHolder.route.setText(item.route);
             viewHolder.destination.setText(item.destination);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    MapLocationDialog mapDialog = new MapLocationDialog();
+                    mapDialog.setPolyline(item.polyline);
+                    mapDialog.show(planFragment.getFragmentManager(), "mapDialog");
+                }
+            });
         } else {
             ViewHolderCommon viewHolder = (ViewHolderCommon) holder;
             viewHolder.title.setText(item.title);
@@ -140,28 +147,59 @@ public class PlanAdapter extends RecyclerView.Adapter {
             @Override
             public void onSelect(final int id) {
                 final MapLocationDialog mapLocationDialog = new MapLocationDialog();
-                mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
-                    @Override
-                    public void onSelect(MapLocation mapLocation) {
-                        item.setAttributeTypeById(id);
-                        item.title = mapLocation.poi;
-                        item.address = mapLocation.address;
-                        item.coordinates = mapLocation.latlng;
 
-                        ApiClient.addPlan(item, planFragment.selectedDate, new JsonHttpResponseHandler() {
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                mapLocationDialog.dismiss();
-                                planFragment.getMonthTravel(planFragment.selectedDate);
-                            }
+                if (id == R.id.transport) {
+                    mapLocationDialog.setMode(MapLocationDialog.SEARCH_ORIGIN);
+                    mapLocationDialog.setOnRouteSelect(new MapLocationDialog.OnRouteSelect() {
+                        @Override
+                        public void onSelect(String startAddress, LatLng startLocation, String endAddress, LatLng endLocation, String summary, List<LatLng> points) {
+                            item.setAttributeTypeById(id);
+                            item.origin = startAddress;
+                            item.originCoordinates = startLocation;
+                            item.destination = endAddress;
+                            item.destinationCoordinates = endLocation;
+                            item.route = summary;
+                            item.polyline = points;
 
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                Toast.makeText(planFragment.getContext(), "FAIL TO WRITE PLAN", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                            ApiClient.addPlan(item, planFragment.selectedDate, new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    mapLocationDialog.dismiss();
+                                    planFragment.getMonthTravel(planFragment.selectedDate);
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    Toast.makeText(planFragment.getContext(), "FAIL TO WRITE PLAN", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    mapLocationDialog.setOnMapSelectedListener(new OnMapSelectListener() {
+                        @Override
+                        public void onSelect(MapLocation mapLocation) {
+                            item.setAttributeTypeById(id);
+                            item.title = mapLocation.poi;
+                            item.address = mapLocation.address;
+                            item.coordinates = mapLocation.latlng;
+
+                            ApiClient.addPlan(item, planFragment.selectedDate, new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    mapLocationDialog.dismiss();
+                                    planFragment.getMonthTravel(planFragment.selectedDate);
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    Toast.makeText(planFragment.getContext(), "FAIL TO WRITE PLAN", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }
+
                 mapLocationDialog.show(planFragment.getFragmentManager(), "mapLocationDialog");
             }
         });
@@ -191,8 +229,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         public ViewHolderTransport(View itemView) {
             super(itemView);
-            time = itemView.findViewById(R.id.time);
-            way = itemView.findViewById(R.id.way);
             origin = itemView.findViewById(R.id.origin);
             route = itemView.findViewById(R.id.route);
             destination = itemView.findViewById(R.id.destination);

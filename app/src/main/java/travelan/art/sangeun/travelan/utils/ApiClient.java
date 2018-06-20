@@ -4,9 +4,14 @@ import android.net.Uri;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,9 +25,9 @@ import travelan.art.sangeun.travelan.models.Plan;
 
 public class ApiClient {
     private static final AsyncHttpClient httpClient = new AsyncHttpClient();
-    private static final String HOST_URL = "http://18.191.11.177:3000";
-//    private static final String HOST_URL = "http://172.30.1.14:3000";
-//    private static final String HOST_URL = "http://192.168.1.29:3000";
+//    private static final String HOST_URL = "http://18.191.11.177:3000";
+//    private static final String HOST_URL = "http://172.30.1.2:3000";
+    private static final String HOST_URL = "http://172.30.1.56:3000";
     private static String token = "";
 
     static public void setToken(String token) {
@@ -113,6 +118,31 @@ public class ApiClient {
             params.put("lng", plan.coordinates.longitude);
         }
 
+        if (plan.originCoordinates != null) {
+            params.put("originLat", plan.destinationCoordinates.latitude);
+            params.put("originLng", plan.destinationCoordinates.longitude);
+        }
+
+        if (plan.destinationCoordinates != null) {
+            params.put("destinationLat", plan.destinationCoordinates.latitude);
+            params.put("destinationLng", plan.destinationCoordinates.longitude);
+        }
+
+        if (plan.polyline != null) {
+            try {
+                JSONArray array = new JSONArray();
+                for (LatLng latlng: plan.polyline) {
+                    JSONObject object = new JSONObject();
+                    object.put("lat", latlng.latitude);
+                    object.put("lng", latlng.longitude);
+                    array.put(object);
+                }
+                params.put("polyline", array.toString());
+            } catch (JSONException e) {
+
+            }
+        }
+
         ApiClient.post("/plan/write", params, httpResponseHandler);
     }
 
@@ -120,6 +150,16 @@ public class ApiClient {
         RequestParams params = new RequestParams();
         params.put("keyword", keyword);
         ApiClient.get("/plan/findLocation", params, httpResponseHandler);
+    }
+
+    static public void findRoute(LatLng origin, LatLng destination, AsyncHttpResponseHandler httpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("originLat", origin.latitude);
+        params.put("originLng", origin.longitude);
+        params.put("destinationLat", destination.latitude);
+        params.put("destinationLng", destination.longitude);
+
+        ApiClient.get("/plan/findRoute", params, httpResponseHandler);
     }
 
     static public void writeNewspeed(int travelId, String content, List<Uri> imageUriList, AsyncHttpResponseHandler httpResponseHandler) throws FileNotFoundException, URISyntaxException {

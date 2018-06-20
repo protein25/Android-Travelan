@@ -14,6 +14,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -31,8 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import travelan.art.sangeun.travelan.adapters.MainPagerAdapter;
 import travelan.art.sangeun.travelan.services.BleScanService;
 import travelan.art.sangeun.travelan.utils.ApiClient;
+import travelan.art.sangeun.travelan.utils.BaseFragment;
 import travelan.art.sangeun.travelan.utils.BleScanner;
 
 
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     public TextView title;
     private FragmentManager fragmentManager;
 
+    private ViewPager container;
+    private MainPagerAdapter mainPagerAdapter;
     private BottomNavigationView navigator;
 
     private String FRAG_NEWSPEED = "newspeed_frag";
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         title = toolbar.findViewById(R.id.title);
 
+        container = findViewById(R.id.container);
         navigator = findViewById(R.id.navigator);
 
         this.setSupportActionBar(toolbar);
@@ -73,10 +79,53 @@ public class MainActivity extends AppCompatActivity {
         navigator.setOnNavigationItemSelectedListener(navListener);
         BottomNavigationViewHelper.disableShiftMode(navigator);
 
-        readyFragement(FRAG_NEWSPEED);
+        mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        container.setAdapter(mainPagerAdapter);
+        container.addOnPageChangeListener(pageChangeListener);
         setToolbar(R.id.nav_newspeed);
         getMyDevices();
     }
+
+    private ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            for(int i = 0; i < mainPagerAdapter.getCount(); i++){
+                mainPagerAdapter.getItem(i).setHasOptionsMenu(false);
+                if (i == position) {
+                    ((BaseFragment)mainPagerAdapter.getItem(i)).onFocus();
+                }
+            }
+            invalidateOptionsMenu();
+
+
+            switch (position) {
+                case 0:
+                    navigator.setSelectedItemId(R.id.nav_newspeed);
+                    break;
+                case 1:
+                    navigator.setSelectedItemId(R.id.nav_plan);
+                    break;
+                case 2:
+                    navigator.setSelectedItemId(R.id.nav_info);
+                    break;
+                case 3:
+                    navigator.setSelectedItemId(R.id.nav_settings);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -86,19 +135,18 @@ public class MainActivity extends AppCompatActivity {
             setToolbar(itemId);
             switch (itemId) {
                 case R.id.nav_newspeed:
-                    readyFragement(FRAG_NEWSPEED);
+                    container.setCurrentItem(0);
                     return true;
                 case R.id.nav_plan:
-                    readyFragement(FRAG_PLAN);
+                    container.setCurrentItem(1);
                     return true;
                 case R.id.nav_info:
-                    readyFragement(FRAG_INFO);
+                    container.setCurrentItem(2);
                     return true;
                 case R.id.nav_settings:
-                    readyFragement(FRAG_SETTINGS);
+                    container.setCurrentItem(3);
                     return true;
             }
-
 
             return false;
         }

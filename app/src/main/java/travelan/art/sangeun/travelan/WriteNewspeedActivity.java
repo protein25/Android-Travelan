@@ -2,10 +2,6 @@ package travelan.art.sangeun.travelan;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,14 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.CarouselViewPager;
 import com.synnapps.carouselview.ImageClickListener;
 import com.synnapps.carouselview.ImageListener;
 
@@ -30,9 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +34,6 @@ import java.util.Map;
 import cz.msebera.android.httpclient.Header;
 import gun0912.tedbottompicker.TedBottomPicker;
 import travelan.art.sangeun.travelan.adapters.SelectTravelAdapter;
-import travelan.art.sangeun.travelan.dialog.SelectLocationDialog;
 import travelan.art.sangeun.travelan.dialog.SelectTravelDialog;
 import travelan.art.sangeun.travelan.utils.Alert;
 import travelan.art.sangeun.travelan.utils.ApiClient;

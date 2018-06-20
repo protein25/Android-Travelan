@@ -16,10 +16,36 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="검색어를 입력 해 주세요"
-            />
+            android:hint="장소를 검색 해 주세요"
+            android:singleLine="true"
+            android:imeOptions="actionDone"/>
         <ImageButton
             android:id="@+id/searchBtn"
+            android:layout_gravity="center_vertical"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#00000000"
+            android:src="@drawable/ic_search_black_24dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/destinationWrapper"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/destinationEdit"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="도착지를 검색 해 주세요"
+            android:singleLine="true"
+            android:imeOptions="actionDone"/>
+        <ImageButton
+            android:id="@+id/destinationSearch"
             android:layout_gravity="center_vertical"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -37,4 +63,9 @@
         android:id="@+id/resultList"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
+    <TextView
+        android:id="@+id/route"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
 </LinearLayout>

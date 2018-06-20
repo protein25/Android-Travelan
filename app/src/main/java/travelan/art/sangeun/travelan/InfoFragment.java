@@ -28,12 +28,13 @@ import cz.msebera.android.httpclient.Header;
 import travelan.art.sangeun.travelan.adapters.InformationListAdapter;
 import travelan.art.sangeun.travelan.models.Information;
 import travelan.art.sangeun.travelan.utils.ApiClient;
+import travelan.art.sangeun.travelan.utils.BaseFragment;
 
 /**
  * Created by sangeun on 2018-05-12.
  */
 
-public class InfoFragment extends Fragment {
+public class InfoFragment extends BaseFragment {
     private static final String TAG = "InfoFragment";
     private RecyclerView recyclerView;
     private InformationListAdapter adapter;
@@ -43,8 +44,6 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_info, container, false);
-        setHasOptionsMenu(true);
-
         getList();
 
         recyclerView = v.findViewById(R.id.infoList);
@@ -53,6 +52,11 @@ public class InfoFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
         return v;
+    }
+
+    @Override
+    public void onFocus() {
+        setHasOptionsMenu(false);
     }
 
     @Override

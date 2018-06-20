@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
@@ -44,12 +45,13 @@ import travelan.art.sangeun.travelan.adapters.BottomSheetListener;
 import travelan.art.sangeun.travelan.adapters.PlanAdapter;
 import travelan.art.sangeun.travelan.models.Plan;
 import travelan.art.sangeun.travelan.utils.ApiClient;
+import travelan.art.sangeun.travelan.utils.BaseFragment;
 
 /**
  * Created by sangeun on 2018-05-12.
  */
 
-public class PlanFragment extends Fragment {
+public class PlanFragment extends BaseFragment {
     private static final String TAG = "PlanFragment";
     private CompactCalendarView calendarView;
     private RecyclerView planList;
@@ -57,6 +59,7 @@ public class PlanFragment extends Fragment {
     private PlanAdapter adapter;
     private FloatingActionButton addBtn;
     private ConstraintLayout selectAttributeType;
+    private TextView yearMonth;
     private LinearLayout attributeTransport;
     private LinearLayout attributeAttraction;
     private LinearLayout attributeAccommodate;
@@ -66,8 +69,6 @@ public class PlanFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(false);
-
         View v = inflater.inflate(R.layout.fragment_plan, container, false);
 
         planList = v.findViewById(R.id.planList);
@@ -78,7 +79,9 @@ public class PlanFragment extends Fragment {
         attributeAccommodate = v.findViewById(R.id.accommodate);
         attributeAttraction = v.findViewById(R.id.attraction);
         selectBackground = v.findViewById(R.id.selectBackground);
+        yearMonth = v.findViewById(R.id.yearMonth);
 
+        calendarView.setCurrentDate(selectedDate);
         getMonthTravel(selectedDate);
 
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
@@ -121,6 +124,11 @@ public class PlanFragment extends Fragment {
     }
 
     @Override
+    public void onFocus() {
+        doneEditPlans();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_plan, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -141,7 +149,7 @@ public class PlanFragment extends Fragment {
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
-
+        yearMonth.setText("" + year + " / " + (month + 1));
         calendarView.removeAllEvents();
 
         ApiClient.getMonthTravel(year, month, new JsonHttpResponseHandler() {
@@ -181,6 +189,9 @@ public class PlanFragment extends Fragment {
 
         List<Event> events = calendarView.getEvents(date);
         if (events.size() <= 0) {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).title.setText("Plan");
+            }
             return;
         }
 
@@ -214,9 +225,22 @@ public class PlanFragment extends Fragment {
                         if (attributeType.equals("transportation")) {
                             plan.time = object.getString("time");
                             plan.origin = object.getString("origin");
+                            JSONObject originPoint = object.getJSONObject("originCoordinates");
+                            JSONArray originCoordinates = originPoint.getJSONArray("coordinates");
+                            plan.originCoordinates = new LatLng(originCoordinates.getDouble(1), originCoordinates.getDouble(0));
                             plan.destination = object.getString("destination");
-                            plan.way = object.getString("way");
+                            JSONObject destinationPoint = object.getJSONObject("originCoordinates");
+                            JSONArray destinationCoordinates = destinationPoint.getJSONArray("coordinates");
+                            plan.destinationCoordinates = new LatLng(destinationCoordinates.getDouble(1), destinationCoordinates.getDouble(0));
                             plan.route = object.getString("route");
+
+                            JSONArray polyline = object.getJSONObject("polyline").getJSONArray("coordinates");
+                            List<LatLng> line = new ArrayList<>();
+                            for (int j = 0; j < polyline.length(); j++) {
+                                JSONArray latlng = polyline.getJSONArray(j);
+                                line.add(new LatLng(latlng.getDouble(1), latlng.getDouble(0)));
+                            }
+                            plan.polyline = line;
                         } else {
                             if (!object.isNull("coordinates")) {
                                 JSONObject point = object.getJSONObject("coordinates");

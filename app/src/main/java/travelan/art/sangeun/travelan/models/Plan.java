@@ -2,6 +2,8 @@ package travelan.art.sangeun.travelan.models;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 import travelan.art.sangeun.travelan.R;
 
 public class Plan {
@@ -22,6 +24,7 @@ public class Plan {
     public String origin;
     public LatLng originCoordinates;
     public String route;
+    public List<LatLng> polyline;
     public String destination;
     public LatLng destinationCoordinates;
 
